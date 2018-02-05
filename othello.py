@@ -5,6 +5,7 @@ Created on Mon Jan 29 14:47:36 2018
 @author: Student
 """
 
+import sys
 
 # =============================================================
 # Just testing to make sure I know how Pushing and Pulling work
@@ -21,24 +22,24 @@ class Pair:
 #spaces 1,9,17,25,33,41,49,57 follow the format: "\n|[letter]"
 #spaces 8,16,24,32,40,48,56,64 follow the format: "|[letter]|"
 #all blank spaces follow the format: "|[blank space]"
-grid = ["\033[4m                 ",
-        "\n| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n| ","| ","| ","| ","| ","| ","| ","| |",]
+grid = ["\033[4m  1 2 3 4 5 6 7 8 ",
+        "\n1","| ","| ","| ","| ","| ","| ","| ","| |",
+        "\n2","| ","| ","| ","| ","| ","| ","| ","| |",
+        "\n3","| ","| ","| ","| ","| ","| ","| ","| |",
+        "\n4","| ","| ","| ","| ","| ","| ","| ","| |",
+        "\n5","| ","| ","| ","| ","| ","| ","| ","| |",
+        "\n6","| ","| ","| ","| ","| ","| ","| ","| |",
+        "\n7","| ","| ","| ","| ","| ","| ","| ","| |",
+        "\n8","| ","| ","| ","| ","| ","| ","| ","| |",]
 
 #prints gameboard grid
 def printGrid():
     print(*grid, sep = '')
 
-grid[28] = "|B"
-grid[29] = "|W"
-grid[36] = "|W"
-grid[37] = "|B"
+grid[32] = "|B"
+grid[33] = "|W"
+grid[41] = "|W"
+grid[42] = "|B"
 
 
 def addToGrid(rows, columns, icon):    
@@ -72,6 +73,10 @@ def takeTurn(player):
             printGrid()
             # Get player input
             newLocation = input("\n\nLocation as x, y:\n\t:")
+            
+            if newLocation == "quit":
+                sys.exit()
+            
             x = int(newLocation[3])
             y = int(newLocation[0])
             
@@ -296,6 +301,9 @@ def takeTurn(player):
                 break
             else:
                 print("Invalid Input")
+        except SystemExit:
+            print("sys.exit() worked as expected")
+            sys.exit()
         except:
             print("Invalid input")
 
