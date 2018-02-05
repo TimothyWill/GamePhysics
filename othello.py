@@ -23,34 +23,34 @@ class Pair:
 #spaces 8,16,24,32,40,48,56,64 follow the format: "|[letter]|"
 #all blank spaces follow the format: "|[blank space]"
 grid = ["\033[4m  1 2 3 4 5 6 7 8 ",
-        "\n1","| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n2","| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n3","| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n4","| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n5","| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n6","| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n7","| ","| ","| ","| ","| ","| ","| ","| |",
-        "\n8","| ","| ","| ","| ","| ","| ","| ","| |",]
+        "\n1","| ","| ","| ","| ","| ","| ","| ","| ","|",
+        "\n2","| ","| ","| ","| ","| ","| ","| ","| ","|",
+        "\n3","| ","| ","| ","| ","| ","| ","| ","| ","|",
+        "\n4","| ","| ","| ","| ","| ","| ","| ","| ","|",
+        "\n5","| ","| ","| ","| ","| ","| ","| ","| ","|",
+        "\n6","| ","| ","| ","| ","| ","| ","| ","| ","|",
+        "\n7","| ","| ","| ","| ","| ","| ","| ","| ","|",
+        "\n8","| ","| ","| ","| ","| ","| ","| ","| ","|","\033[0m"]
 
 #prints gameboard grid
 def printGrid():
     print(*grid, sep = '')
 
-grid[32] = "|B"
-grid[33] = "|W"
-grid[41] = "|W"
-grid[42] = "|B"
+grid[35] = "|B"
+grid[36] = "|W"
+grid[45] = "|W"
+grid[46] = "|B"
 
 
 def addToGrid(rows, columns, icon):    
-    grid[9*(rows-1)+columns+1] = "|" + str(icon)
+    grid[10*(rows-1)+columns+1] = "|" + str(icon)
 
 def getFromGrid(rows, columns):
-    position = 9*(rows-1) + columns+1
+    position = 10*(rows-1) + columns+1
     
     gridElement = grid[position]
     
-    if (position % 9 == 0):
+    if (position % 10 == 0):
         return gridElement[3]
     else:
         return gridElement[1]
