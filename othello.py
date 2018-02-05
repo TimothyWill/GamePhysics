@@ -43,19 +43,22 @@ grid[42] = "|B"
 
 
 def addToGrid(rows, columns, icon):    
-    grid[8*(rows-1)+columns] = "|" + str(icon)
+    grid[9*(rows-1)+columns+1] = "|" + str(icon)
 
 def getFromGrid(rows, columns):
-    position = 8*(rows-1) + columns
+    position = 9*(rows-1) + columns+1
     
     gridElement = grid[position]
     
-    if (position % 8 == 0):
+    if (position % 9 == 0):
         return gridElement[3]
     else:
         return gridElement[1]
     
-        
+def checkAvailableMoves(player):
+    
+    possibleMoves = 0
+    print(possibleMoves)
 
 def takeTurn(player):
     
@@ -300,12 +303,12 @@ def takeTurn(player):
             if validMove:
                 break
             else:
-                print("Invalid Input")
+                print("Invalid Move")
         except SystemExit:
             print("sys.exit() worked as expected")
             sys.exit()
         except:
-            print("Invalid input")
+            print("Invalid Input")
 
     
     addToGrid(x, y, icon)
