@@ -228,7 +228,6 @@ def checkAvailableMoves(icon, opponentIcon):
                 FlipList = []
                 
                 if validMove:
-                    print(y,x)
                     possibleMoves += 1
     
     return possibleMoves
@@ -248,8 +247,10 @@ def takeTurn(player):
         try:
             print("")
             printGrid()
+            print("\033[4m\n",player,"Turn\033[0m")
+            
             # Get player input
-            newLocation = input("\n\nLocation as x,y:\n\t:")
+            newLocation = input("Location as x,y:\n\t:")
             
             if newLocation == "quit":
                 sys.exit()
@@ -330,7 +331,7 @@ def takeTurn(player):
                     
                 FlipList = []
                 # Check Up
-                for i in reversed(range(0, x)):
+                for i in reversed(range(1, x)):
                     # If the tile has your opponent's icon
                     if getFromGrid(i, y) == opponentIcon:
                         FlipList.append(Pair(i, y))
@@ -477,13 +478,13 @@ def takeTurn(player):
             if validMove:
                 break
             else:
-                print("Invalid Move")
+                print("\033[4m\nInvalid Move\033[0m")
                 print("Possible Moves: ", checkAvailableMoves(icon, opponentIcon))
         except SystemExit:
-            print("sys.exit() worked as expected")
+            print("Goodbye")
             sys.exit()
         except:
-            print("Invalid Input")
+            print("\033[4m\nInvalid Input\033[0m")
 
     
     addToGrid(x, y, icon)
@@ -521,7 +522,7 @@ while True:
         takeTurn("Black")
         numberPassed = 0
     else:
-        print("Passed")
+        print("Black Turn Forfeited")
         numberPassed += 1
         if numberPassed == 2:
             print("Game Over")
@@ -530,9 +531,11 @@ while True:
         takeTurn("White")
         numberPassed = 0
     else:
-        print("Passed")
+        print("White Turn Forfeited")
         numberPassed += 1
         if numberPassed == 2:
             print("Game Over")
+            print("")
+            printGrid()
             break
     
