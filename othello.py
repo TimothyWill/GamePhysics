@@ -55,10 +55,183 @@ def getFromGrid(rows, columns):
     else:
         return gridElement[1]
     
-def checkAvailableMoves(player):
+def checkAvailableMoves(icon, opponentIcon):
     
     possibleMoves = 0
-    print(possibleMoves)
+
+    # Loop through entire grid
+    for x in range(1, 8):
+        for y in range(1, 8):
+            validMove = False
+            
+            if getFromGrid(x, y) == " ":
+    
+                # Check for Flipping
+                
+                # Check to the Right
+                FlipList = []
+                for i in range(y + 1, 8):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(x, i) == opponentIcon:
+                        FlipList.append(Pair(x, i))
+                    # If the tile has your own icon
+                    elif getFromGrid(x, i) == icon:
+                        # Check valid move        
+                        if len(FlipList) > 0:
+                            validMove = True
+                            break
+                        else:
+                            break
+            
+                # Check to the Left
+                FlipList = []
+                for i in reversed (range(0, y)):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(x, i) == opponentIcon:
+                        FlipList.append(Pair(x, i))
+                    # If the tile has your own icon
+                    elif getFromGrid(x, i) == icon:
+                        #Check valid move
+                        if len(FlipList) > 0:
+                            validMove = True
+                            break
+                        else:
+                            break
+         
+                # Check Down
+                FlipList = []
+                for i in range(x + 1, 8):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(i, y) == opponentIcon:
+                        FlipList.append(Pair(i, y))
+                    # If the tile has your own icon
+                    elif getFromGrid(i, y) == icon:
+                        #Check valid move
+                        if len(FlipList) > 0:
+                            validMove = True
+                            break
+                        else:
+                            break
+                
+                # Check Up
+                FlipList = []
+                for i in reversed(range(0, x)):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(i, y) == opponentIcon:
+                        FlipList.append(Pair(i, y))
+                    # If the tile has your own icon
+                    elif getFromGrid(i, y) == icon:
+                        #Check valid move
+                        if len(FlipList) > 0:
+                            validMove = True
+                            break
+                        else:
+                            break
+   
+                # Check Up-Right             
+                FlipList = []
+
+                distY = 8-y
+                distX = 8-x
+                minimumDistance = 0
+                
+                if distY < distX:
+                    minimumDistance = distY
+                else:
+                    minimumDistance = distX
+                
+                for i in range(1, minimumDistance):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(x + i, y + i) == opponentIcon:
+                        FlipList.append(Pair(x + i, i + y))
+                    # If the tile has your own icon
+                    elif getFromGrid(x + i, y + i) == icon:
+                        #Check valid move
+                        if len(FlipList) > 0:
+                            validMove = True
+                            break
+                        else:
+                            break
+
+                # Check Up-Left               
+                FlipList = []
+
+                distY = 8-y
+                distX = x
+        
+                if distY < distX:
+                    minimumDistance = distY
+                else:
+                    minimumDistance = distX
+                
+                for i in range(1, minimumDistance):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(x - i, y + i) == opponentIcon:
+                        FlipList.append(Pair(x - i, i + y))
+                    # If the tile has your own icon
+                    elif getFromGrid(x - i, y + i) == icon:
+                        #Check valid move
+                        if len(FlipList) > 0:
+                            validMove = True
+                            break
+                        else:
+                            break
+  
+                # Check Down-Left              
+                FlipList = []
+
+                distY = y
+                distX = x
+                
+                if distY < distX:
+                    minimumDistance = distY
+                else:
+                    minimumDistance = distX
+                
+                for i in range(1, minimumDistance):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(x - i, y - i) == opponentIcon:
+                        FlipList.append(Pair(x - i, y - i))
+                    # If the tile has your own icon
+                    elif getFromGrid(x - i, y - i) == icon:
+                        #Check valid move
+                        if len(FlipList) > 0:
+                            validMove = True
+                            break
+                        else:
+                            break
+    
+                # Down-Right            
+                FlipList = []
+                    
+                distY = y
+                distX = 8 - x
+                
+                if distY < distX:
+                    minimumDistance = distY
+                else:
+                    minimumDistance = distX
+                
+                for i in range(1, minimumDistance):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(x + i, y - i) == opponentIcon:
+                        FlipList.append(Pair(x + i, y - i))
+                    # If the tile has your own icon
+                    elif getFromGrid(x + i, y - i) == icon:
+                        #Check valid move
+                        if len(FlipList) > 0:
+                            validMove = True
+                            break
+                        else:
+                            break
+                
+                FlipList = []
+                
+                if validMove:
+                    print(x, y)
+                    possibleMoves += 1
+    
+    return possibleMoves
 
 def takeTurn(player):
     
@@ -304,6 +477,7 @@ def takeTurn(player):
                 break
             else:
                 print("Invalid Move")
+                print("Possible Moves: ", checkAvailableMoves(icon, opponentIcon))
         except SystemExit:
             print("sys.exit() worked as expected")
             sys.exit()
