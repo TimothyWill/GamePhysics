@@ -490,6 +490,23 @@ def takeTurn(player):
     
 # Main Game Loop
 while True:
-    takeTurn("Black")
-    takeTurn("White")
+    numberPassed = 0
+    if (checkAvailableMoves("B", "W")):
+        takeTurn("Black")
+        numberPassed = 0
+    else:
+        print("Passed")
+        numberPassed += 1
+        if numberPassed == 2:
+            print("Game Over")
+            break
+    if (checkAvailableMoves("B", "W")):
+        takeTurn("White")
+        numberPassed = 0
+    else:
+        print("Passed")
+        numberPassed += 1
+        if numberPassed == 2:
+            print("Game Over")
+            break
     
