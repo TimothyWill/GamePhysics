@@ -60,8 +60,8 @@ def checkAvailableMoves(icon, opponentIcon):
     possibleMoves = 0
 
     # Loop through entire grid
-    for x in range(1, 8):
-        for y in range(1, 8):
+    for x in range(1, 9):
+        for y in range(1, 9):
             validMove = False
             
             if getFromGrid(x, y) == " ":
@@ -228,7 +228,7 @@ def checkAvailableMoves(icon, opponentIcon):
                 FlipList = []
                 
                 if validMove:
-                    print(x, y)
+                    print(y,x)
                     possibleMoves += 1
     
     return possibleMoves
@@ -246,14 +246,15 @@ def takeTurn(player):
     
     while True:
         try:
+            print("")
             printGrid()
             # Get player input
-            newLocation = input("\n\nLocation as x, y:\n\t:")
+            newLocation = input("\n\nLocation as x,y:\n\t:")
             
             if newLocation == "quit":
                 sys.exit()
             
-            x = int(newLocation[3])
+            x = int(newLocation[2])
             y = int(newLocation[0])
             
             # print("X: " + str(x) + "Y: " + str(y))
@@ -489,6 +490,31 @@ def takeTurn(player):
     
     
 # Main Game Loop
+    
+print("\033[4mOTHELLO\033[0m")
+print("")
+print("Goal: The winner is the player who has more discs of his colour than his ",
+      "opponent at the end of the game. ",
+      "This will happen when neither of the two players has a legal move. ")
+print("")
+print("Rules: Black always moves first.\n", 
+      "A move is made by placing a disc of the player's color on the board in a position that ",
+      "out-flanks one or more of the opponent's discs.\n",
+      "A disc or row of discs is outflanked when it is surrounded at the ends by discs of the opposite color.\n",
+      "A disc may outflank any number of discs in one or more rows in any direction ",
+      "(horizontal, vertical, diagonal). \n",
+      "All the discs which are outflanked will be flipped, even if it is to the player's advantage not to flip ",
+      "them.\n",
+      "Discs may only be outflanked as a direct result of a move and must fall in the direct line of the ",
+      "disc being played. \n",
+      "If you can't outflank and flip at least one opposing disc, you must pass your turn. \n",
+      "However, if a move is available to you, you can't forfeit your turn. ")
+print("")
+print("Input: Location to place a piece on your turn is input as 'x,y'.\n", 
+      "If you wish to exit the game early input 'quit'")
+
+
+
 while True:
     numberPassed = 0
     if (checkAvailableMoves("B", "W")):
