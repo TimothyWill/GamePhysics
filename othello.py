@@ -79,9 +79,9 @@ def checkAvailableMoves(icon, opponentIcon):
                         # Check valid move        
                         if len(FlipList) > 0:
                             validMove = True
-                            break
-                        else:
-                            break
+                        break
+                    else:
+                        break
             
                 # Check to the Left
                 FlipList = []
@@ -94,9 +94,9 @@ def checkAvailableMoves(icon, opponentIcon):
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
-                            break
-                        else:
-                            break
+                        break
+                    else:
+                        break
          
                 # Check Down
                 FlipList = []
@@ -109,13 +109,13 @@ def checkAvailableMoves(icon, opponentIcon):
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
-                            break
-                        else:
-                            break
+                        break
+                    else:
+                        break
                 
                 # Check Up
                 FlipList = []
-                for i in reversed(range(0, x)):
+                for i in reversed(range(1, x)):
                     # If the tile has your opponent's icon
                     if getFromGrid(i, y) == opponentIcon:
                         FlipList.append(Pair(i, y))
@@ -124,9 +124,9 @@ def checkAvailableMoves(icon, opponentIcon):
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
-                            break
-                        else:
-                            break
+                        break
+                    else:
+                        break
    
                 # Check Up-Right             
                 FlipList = []
@@ -149,9 +149,9 @@ def checkAvailableMoves(icon, opponentIcon):
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
-                            break
-                        else:
-                            break
+                        break
+                    else:
+                        break
 
                 # Check Up-Left               
                 FlipList = []
@@ -173,9 +173,9 @@ def checkAvailableMoves(icon, opponentIcon):
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
-                            break
-                        else:
-                            break
+                        break
+                    else:
+                        break
   
                 # Check Down-Left              
                 FlipList = []
@@ -197,9 +197,9 @@ def checkAvailableMoves(icon, opponentIcon):
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
-                            break
-                        else:
-                            break
+                        break
+                    else:
+                        break
     
                 # Down-Right            
                 FlipList = []
@@ -221,9 +221,9 @@ def checkAvailableMoves(icon, opponentIcon):
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
-                            break
-                        else:
-                            break
+                        break
+                    else:
+                        break
                 
                 FlipList = []
                 
@@ -500,7 +500,7 @@ while True:
         if numberPassed == 2:
             print("Game Over")
             break
-    if (checkAvailableMoves("B", "W")):
+    if (checkAvailableMoves("W", "B")):
         takeTurn("White")
         numberPassed = 0
     else:
