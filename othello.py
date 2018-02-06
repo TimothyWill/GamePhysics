@@ -228,6 +228,7 @@ def checkAvailableMoves(icon, opponentIcon):
                 FlipList = []
                 
                 if validMove:
+                    #print(y,x)
                     possibleMoves += 1
     
     return possibleMoves
@@ -492,7 +493,7 @@ def takeTurn(player):
     
 # Main Game Loop
     
-print("\033[4mOTHELLO\033[0m")
+print("\033[4m\nOTHELLO\033[0m")
 print("")
 print("Goal: The winner is the player who has more discs of his colour than his ",
       "opponent at the end of the game. ",
@@ -518,6 +519,9 @@ print("Input: Location to place a piece on your turn is input as 'x,y'.\n",
 
 while True:
     numberPassed = 0
+    whiteScore = 0
+    blackScore = 0
+    
     if (checkAvailableMoves("B", "W")):
         takeTurn("Black")
         numberPassed = 0
@@ -525,7 +529,26 @@ while True:
         print("Black Turn Forfeited")
         numberPassed += 1
         if numberPassed == 2:
-            print("Game Over")
+            print("\nGame Over")
+            print("")
+            
+            for x in range(1, 9):
+                for y in range(1, 9):
+                    if getFromGrid(x, y) == "W":
+                        whiteScore += 1
+                    elif getFromGrid(x, y) == "B":
+                        blackScore += 1
+            
+            if blackScore > whiteScore:
+                print("\033[4m\nBlack Wins!\n\033[0m")
+            elif whiteScore > blackScore:
+                print("\033[4m\nWhite Wins!\n\033[0m")
+            else:
+                print("\033[4m\nTie\033[0m")
+                
+            print(blackScore, ":", whiteScore)
+            print("")
+            printGrid()
             break
     if (checkAvailableMoves("W", "B")):
         takeTurn("White")
@@ -534,7 +557,24 @@ while True:
         print("White Turn Forfeited")
         numberPassed += 1
         if numberPassed == 2:
-            print("Game Over")
+            print("\nGame Over")
+            print("")
+            
+            for x in range(1, 9):
+                for y in range(1, 9):
+                    if getFromGrid(x, y) == "W":
+                        whiteScore += 1
+                    elif getFromGrid(x, y) == "B":
+                        blackScore += 1
+            
+            if blackScore > whiteScore:
+                print("\033[4m\nBlack Wins!\n\033[0m")
+            elif whiteScore > blackScore:
+                print("\033[4m\nWhite Wins!\n\033[0m")
+            else:
+                print("\033[4m\nTie\033[0m")
+                
+            print(blackScore, ":", whiteScore)
             print("")
             printGrid()
             break
