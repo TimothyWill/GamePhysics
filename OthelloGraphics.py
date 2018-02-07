@@ -91,6 +91,9 @@ def main():
                 pygame.draw.rect(screen, color, [(5+20) * column + 5, 
                                                (5+20) * row + 5,
                                                20, 20])
+                pygame.draw.circle(screen, color, [(5+10) * column + (10 * column) + 15,
+                                                   (5+10) * row + (10 * row) + 15]
+                                                    ,10)
         
         # --- Update the screen with what we've drawn.
         pygame.display.update()
