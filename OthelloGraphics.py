@@ -71,12 +71,15 @@ def main():
                 
         for row in range(8):
             for column in range(8):
-                color = RED
+                color = GRAY
                 if grid[row][column] == 1:
-                    color = BLUE
-                pygame.draw.rect(screen, color, [(5+20) * column + 5, 
+                    color = BLACK
+                pygame.draw.rect(screen, GRAY, [(5+20) * column + 5, 
                                                (5+20) * row + 5,
                                                20, 20])
+                pygame.draw.circle(screen, color, [(5+10) * column + (10 * column) + 15,
+                                                   (5+10) * row + (10 * row) + 15]
+                                                    ,10)
         
         # --- Update the screen with what we've drawn.
         pygame.display.update()
