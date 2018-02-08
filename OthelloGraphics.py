@@ -13,6 +13,7 @@ GREEN    = (   0, 255,   0)
 RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
+TAN      = ( 210, 180, 140)
 
 grid = []
 
@@ -32,7 +33,7 @@ def main():
     for row in range(8):
         grid.append([])
         for column in range(8):
-            grid[row].append(0)
+            grid[row].append(" ")
     grid[3][3] = "B"
     grid[3][4] = "W"
     grid[4][3] = "W"
@@ -42,6 +43,7 @@ def main():
     clock = pygame.time.Clock()
     # -------- Main Program Loop -----------\
     done = False
+    player = "White"
     while not done:
         # --- Main event loop
         """ Event Handling """
@@ -52,15 +54,23 @@ def main():
                 #print(event.key, event.mod, event.unicode)
                 if event.key == pygame.K_ESCAPE:
                     print("Escape key pressed.")
+            # Player clicks a square
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 column = pos[0] // 25
                 row = pos[1] // 25
                 if row < 8 and column < 8:
-                    grid[row][column] = "W"
+                    if player == "White":
+                        if checkPoint(row + 1, column + 1, "W", "B"):
+                            player = "Black"
+                            addToGrid(row + 1, column + 1, "W")
+                    else:
+                        if checkPoint(row + 1, column + 1, "B", "W"):
+                            player = "White"
+                            addToGrid(row + 1, column + 1, "B")
+                    
                     print(row, column)
-                    if grid[row][column] == 1:
-                        print("You have clicked the square:",row,",",column)
+                    print("You have clicked the square:",row,",",column)
         
         """ State Checking """
         key = pygame.key.get_pressed()
@@ -68,7 +78,7 @@ def main():
             print("SPACEBAR!!!")
             background_color = BLACK
         else:
-            background_color = WHITE 
+            background_color = BLACK
         
         # --- Drawing code should go here
         # First, clear the screen
@@ -83,12 +93,12 @@ def main():
                 
         for row in range(8):
             for column in range(8):
-                color = RED
+                color = TAN
                 if grid[row][column] == "W":
                     color = WHITE
                 elif grid[row][column] == "B":
                     color = BLACK
-                pygame.draw.rect(screen, color, [(5+20) * column + 5, 
+                pygame.draw.rect(screen, TAN, [(5+20) * column + 5, 
                                                (5+20) * row + 5,
                                                20, 20])
                 pygame.draw.circle(screen, color, [(5+10) * column + (10 * column) + 15,
@@ -107,7 +117,7 @@ def getFromGrid(rows, columns):
     return grid[rows - 1][columns - 1]
 
 def addToGrid(x, y, icon):
-    grid[x][y] = icon
+    grid[x - 1][y - 1] = icon
     
 def checkAvailableMoves(icon, opponentIcon):
     
