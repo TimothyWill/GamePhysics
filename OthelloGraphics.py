@@ -43,7 +43,7 @@ def main():
     clock = pygame.time.Clock()
     # -------- Main Program Loop -----------\
     done = False
-    player = "White"
+    player = "Black"
     while not done:
         # --- Main event loop
         """ Event Handling """
