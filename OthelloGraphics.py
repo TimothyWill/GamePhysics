@@ -134,7 +134,7 @@ def checkAvailableMoves(icon, opponentIcon):
                 
                 # Check to the Right
                 FlipList = []
-                for i in range(y + 1, 8):
+                for i in range(y + 1, 9):
                     # If the tile has your opponent's icon
                     if getFromGrid(x, i) == opponentIcon:
                         FlipList.append(Pair(x, i))
@@ -164,7 +164,7 @@ def checkAvailableMoves(icon, opponentIcon):
          
                 # Check Down
                 FlipList = []
-                for i in range(x + 1, 8):
+                for i in range(x + 1, 9):
                     # If the tile has your opponent's icon
                     if getFromGrid(i, y) == opponentIcon:
                         FlipList.append(Pair(i, y))
@@ -308,7 +308,7 @@ def checkPoint(x, y, icon, opponentIcon):
         
         # Check to the right
         FlipList = []
-        for i in range(y + 1, 8):
+        for i in range(y + 1, 9):
             # If the tile has your opponent's icon
             if getFromGrid(x, i) == opponentIcon:
                 FlipList.append(Pair(x, i))
@@ -330,7 +330,7 @@ def checkPoint(x, y, icon, opponentIcon):
         # List of disks to be flipped
         FlipList = []
         # Check to the left
-        for i in reversed (range(0, y)):
+        for i in reversed (range(1, y)):
             # If the tile has your opponent's icon
             if getFromGrid(x, i) == opponentIcon:
                 FlipList.append(Pair(x, i))
@@ -351,7 +351,7 @@ def checkPoint(x, y, icon, opponentIcon):
         
         FlipList = []
         # Check Down
-        for i in range(x + 1, 8):
+        for i in range(x + 1, 9):
             # If the tile has your opponent's icon
             if getFromGrid(i, y) == opponentIcon:
                 FlipList.append(Pair(i, y))
