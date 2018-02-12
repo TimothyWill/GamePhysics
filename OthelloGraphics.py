@@ -42,9 +42,14 @@ def main():
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
     # -------- Main Program Loop -----------\
+    numberPassed = 0
+    whiteScore = 0
+    blackScore = 0
     done = False
     player = "Black"
     while not done:
+        
+        
         # --- Main event loop
         """ Event Handling """
         for event in pygame.event.get(): 
@@ -57,20 +62,50 @@ def main():
             # Player clicks a square
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
-                column = pos[0] // 25
-                row = pos[1] // 25
+                column = pos[1] // 25
+                row = pos[0] // 25
                 if row < 8 and column < 8:
                     if player == "White":
-                        if checkPoint(row + 1, column + 1, "W", "B"):
+                        if checkPoint(row, column, "W", "B"):
+                            numberPassed = 0
                             player = "Black"
-                            addToGrid(row + 1, column + 1, "W")
+                            addToGrid(row, column, "W")
+                        elif (checkAvailableMoves("W", "B") == 0):
+                            print("White Turn Forfeited")
+                            player = "Black"
+                            numberPassed += 1
                     else:
-                        if checkPoint(row + 1, column + 1, "B", "W"):
+                        if checkPoint(row, column, "B", "W"):
+                            numberPassed = 0
                             player = "White"
-                            addToGrid(row + 1, column + 1, "B")
+                            addToGrid(row, column, "B")
+                        elif (checkAvailableMoves("W", "B") == 0):
+                            print("Black Turn Forfeited")
+                            player = "White"
+                            numberPassed += 1
                     
-                    print(row, column)
-                    print("You have clicked the square:",row,",",column)
+                    print("You have clicked the square:",row + 1,",",column + 1)
+                    
+                    # Update score
+                    for x in range(0, 8):
+                        for y in range(0, 8):
+                            if getFromGrid(x, y) == "W":
+                                whiteScore += 1
+                            elif getFromGrid(x, y) == "B":
+                                blackScore += 1
+                        
+                    # Check for game over
+                    if numberPassed == 2:
+                        print("\nGame Over")
+                        print("")
+                        done = True
+                        
+                        if blackScore > whiteScore:
+                            print("\033[4m\nBlack Wins!\n\033[0m")
+                        elif whiteScore > blackScore:
+                            print("\033[4m\nWhite Wins!\n\033[0m")
+                        else:
+                            print("\033[4m\nTie\033[0m")
         
         """ State Checking """
         key = pygame.key.get_pressed()
@@ -114,18 +149,18 @@ def main():
     pygame.quit()
 
 def getFromGrid(rows, columns):
-    return grid[rows - 1][columns - 1]
+    return grid[columns][rows]
 
 def addToGrid(x, y, icon):
-    grid[x - 1][y - 1] = icon
+    grid[y][x] = icon
     
 def checkAvailableMoves(icon, opponentIcon):
     
     possibleMoves = 0
 
     # Loop through entire grid
-    for x in range(1, 9):
-        for y in range(1, 9):
+    for x in range(0, 8):
+        for y in range(0, 8):
             validMove = False
             
             if getFromGrid(x, y) == " ":
@@ -134,12 +169,12 @@ def checkAvailableMoves(icon, opponentIcon):
                 
                 # Check to the Right
                 FlipList = []
-                for i in range(y + 1, 9):
+                for i in range(1, 8 - x):
                     # If the tile has your opponent's icon
-                    if getFromGrid(x, i) == opponentIcon:
-                        FlipList.append(Pair(x, i))
+                    if getFromGrid(x + i, y) == opponentIcon:
+                        FlipList.append(Pair(x + i, y))
                     # If the tile has your own icon
-                    elif getFromGrid(x, i) == icon:
+                    elif getFromGrid(x + i, y) == icon:
                         # Check valid move        
                         if len(FlipList) > 0:
                             validMove = True
@@ -149,12 +184,12 @@ def checkAvailableMoves(icon, opponentIcon):
             
                 # Check to the Left
                 FlipList = []
-                for i in reversed (range(0, y)):
+                for i in range(1, x + 1):
                     # If the tile has your opponent's icon
-                    if getFromGrid(x, i) == opponentIcon:
-                        FlipList.append(Pair(x, i))
+                    if getFromGrid(x - i, y) == opponentIcon:
+                        FlipList.append(Pair(x - 1, y))
                     # If the tile has your own icon
-                    elif getFromGrid(x, i) == icon:
+                    elif getFromGrid(x - i, y) == icon:
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
@@ -164,12 +199,12 @@ def checkAvailableMoves(icon, opponentIcon):
          
                 # Check Down
                 FlipList = []
-                for i in range(x + 1, 9):
+                for i in range(1, 8 - y):
                     # If the tile has your opponent's icon
-                    if getFromGrid(i, y) == opponentIcon:
-                        FlipList.append(Pair(i, y))
+                    if getFromGrid(x, y + i) == opponentIcon:
+                        FlipList.append(Pair(x, y + i))
                     # If the tile has your own icon
-                    elif getFromGrid(i, y) == icon:
+                    elif getFromGrid(x, y + i) == icon:
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
@@ -179,12 +214,12 @@ def checkAvailableMoves(icon, opponentIcon):
                 
                 # Check Up
                 FlipList = []
-                for i in reversed(range(1, x)):
+                for i in range(1, y + 1):
                     # If the tile has your opponent's icon
-                    if getFromGrid(i, y) == opponentIcon:
-                        FlipList.append(Pair(i, y))
+                    if getFromGrid(x, y - i) == opponentIcon:
+                        FlipList.append(Pair(x, y - i))
                     # If the tile has your own icon
-                    elif getFromGrid(i, y) == icon:
+                    elif getFromGrid(x, y - i) == icon:
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
@@ -195,8 +230,8 @@ def checkAvailableMoves(icon, opponentIcon):
                 # Check Up-Right             
                 FlipList = []
 
-                distY = 8-y
-                distX = 8-x
+                distY = y + 1
+                distX = 8 - x
                 minimumDistance = 0
                 
                 if distY < distX:
@@ -206,10 +241,10 @@ def checkAvailableMoves(icon, opponentIcon):
                 
                 for i in range(1, minimumDistance):
                     # If the tile has your opponent's icon
-                    if getFromGrid(x + i, y + i) == opponentIcon:
-                        FlipList.append(Pair(x + i, i + y))
+                    if getFromGrid(x + i, y - i) == opponentIcon:
+                        FlipList.append(Pair(x + i, y - i))
                     # If the tile has your own icon
-                    elif getFromGrid(x + i, y + i) == icon:
+                    elif getFromGrid(x + i, y - i) == icon:
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
@@ -220,33 +255,9 @@ def checkAvailableMoves(icon, opponentIcon):
                 # Check Up-Left               
                 FlipList = []
 
-                distY = 8-y
-                distX = x
+                distY = y + 1
+                distX = x + 1
         
-                if distY < distX:
-                    minimumDistance = distY
-                else:
-                    minimumDistance = distX
-                
-                for i in range(1, minimumDistance):
-                    # If the tile has your opponent's icon
-                    if getFromGrid(x - i, y + i) == opponentIcon:
-                        FlipList.append(Pair(x - i, i + y))
-                    # If the tile has your own icon
-                    elif getFromGrid(x - i, y + i) == icon:
-                        #Check valid move
-                        if len(FlipList) > 0:
-                            validMove = True
-                        break
-                    else:
-                        break
-  
-                # Check Down-Left              
-                FlipList = []
-
-                distY = y
-                distX = x
-                
                 if distY < distX:
                     minimumDistance = distY
                 else:
@@ -264,11 +275,35 @@ def checkAvailableMoves(icon, opponentIcon):
                         break
                     else:
                         break
+  
+                # Check Down-Left              
+                FlipList = []
+
+                distY = 8 - y
+                distX = x + 1
+                
+                if distY < distX:
+                    minimumDistance = distY
+                else:
+                    minimumDistance = distX
+                
+                for i in range(1, minimumDistance):
+                    # If the tile has your opponent's icon
+                    if getFromGrid(x - i, y + i) == opponentIcon:
+                        FlipList.append(Pair(x - i, y + i))
+                    # If the tile has your own icon
+                    elif getFromGrid(x - i, y + i) == icon:
+                        #Check valid move
+                        if len(FlipList) > 0:
+                            validMove = True
+                        break
+                    else:
+                        break
     
                 # Down-Right            
                 FlipList = []
                     
-                distY = y
+                distY = 8 - y
                 distX = 8 - x
                 
                 if distY < distX:
@@ -278,10 +313,10 @@ def checkAvailableMoves(icon, opponentIcon):
                 
                 for i in range(1, minimumDistance):
                     # If the tile has your opponent's icon
-                    if getFromGrid(x + i, y - i) == opponentIcon:
-                        FlipList.append(Pair(x + i, y - i))
+                    if getFromGrid(x + i, y + i) == opponentIcon:
+                        FlipList.append(Pair(x + i, y + i))
                     # If the tile has your own icon
-                    elif getFromGrid(x + i, y - i) == icon:
+                    elif getFromGrid(x + i, y + i) == icon:
                         #Check valid move
                         if len(FlipList) > 0:
                             validMove = True
@@ -308,13 +343,13 @@ def checkPoint(x, y, icon, opponentIcon):
         
         # Check to the right
         FlipList = []
-        for i in range(y + 1, 9):
+        for i in range(1, 8 - x):
             # If the tile has your opponent's icon
-            if getFromGrid(x, i) == opponentIcon:
-                FlipList.append(Pair(x, i))
+            if getFromGrid(x + i, y) == opponentIcon:
+                FlipList.append(Pair(x + i, y))
                 # print(str(i)+", "+str(x)+" is your opponent's icon")
             # If the tile has your own icon
-            elif getFromGrid(x, i) == icon:
+            elif getFromGrid(x + i, y) == icon:
                 # print(str(x)+", "+str(i)+" is your icon")
                 # Flip the disks
                 for j in FlipList:
@@ -330,13 +365,13 @@ def checkPoint(x, y, icon, opponentIcon):
         # List of disks to be flipped
         FlipList = []
         # Check to the left
-        for i in reversed (range(1, y)):
+        for i in range(1, x + 1):
             # If the tile has your opponent's icon
-            if getFromGrid(x, i) == opponentIcon:
-                FlipList.append(Pair(x, i))
+            if getFromGrid(x - i, y) == opponentIcon:
+                FlipList.append(Pair(x - i, y))
                 # print(str(i)+", "+str(x)+" is your opponent's icon")
             # If the tile has your own icon
-            elif getFromGrid(x, i) == icon:
+            elif getFromGrid(x - i, y) == icon:
                 # print(str(x)+", "+str(i)+" is your icon")
                 # Flip the disks
                 for j in FlipList:
@@ -351,13 +386,13 @@ def checkPoint(x, y, icon, opponentIcon):
         
         FlipList = []
         # Check Down
-        for i in range(x + 1, 9):
+        for i in range(1, 8 - y):
             # If the tile has your opponent's icon
-            if getFromGrid(i, y) == opponentIcon:
-                FlipList.append(Pair(i, y))
+            if getFromGrid(x, y + i) == opponentIcon:
+                FlipList.append(Pair(x, y + i))
                 # print(str(y)+", "+str(i)+" is your opponent's icon")
             # If the tile has your own icon
-            elif getFromGrid(i, y) == icon:
+            elif getFromGrid(x, y + i) == icon:
                 # print(str(y)+", "+str(i)+" is your icon")
                 # Flip the disks
                 for j in FlipList:
@@ -371,13 +406,13 @@ def checkPoint(x, y, icon, opponentIcon):
             
         FlipList = []
         # Check Up
-        for i in reversed(range(1, x)):
+        for i in range(1, y + 1):
             # If the tile has your opponent's icon
-            if getFromGrid(i, y) == opponentIcon:
-                FlipList.append(Pair(i, y))
+            if getFromGrid(x, y - i) == opponentIcon:
+                FlipList.append(Pair(x, y - i))
                 # print(str(y)+", "+str(i)+" is your opponent's icon")
             # If the tile has your own icon
-            elif getFromGrid(i, y) == icon:
+            elif getFromGrid(x, y - i) == icon:
                 # print(str(y)+", "+str(i)+" is your icon")
                 # Flip the disks
                 for j in FlipList:
@@ -391,7 +426,7 @@ def checkPoint(x, y, icon, opponentIcon):
         
         FlipList = []
         
-        # Check Up-Right
+        # Check Down-Right
         
         distY = 8-y
         distX = 8-x
@@ -407,7 +442,7 @@ def checkPoint(x, y, icon, opponentIcon):
         for i in range(1, minimumDistance):
              # If the tile has your opponent's icon
             if getFromGrid(x + i, y + i) == opponentIcon:
-                FlipList.append(Pair(x + i, i + y))
+                FlipList.append(Pair(x + i, y + i))
                 # print(str(i + y)+", "+str(i + x)+" is your opponent's icon")
             # If the tile has your own icon
             elif getFromGrid(x + i, y + i) == icon:
@@ -425,9 +460,9 @@ def checkPoint(x, y, icon, opponentIcon):
         FlipList = []
         
         
-        # Up-Left
-        distY = 8-y
-        distX = x
+        # Up-right
+        distY = y + 1
+        distX = 8 - x
         if distY < distX:
             minimumDistance = distY
         else:
@@ -436,11 +471,11 @@ def checkPoint(x, y, icon, opponentIcon):
         
         for i in range(1, minimumDistance):
              # If the tile has your opponent's icon
-            if getFromGrid(x - i, y + i) == opponentIcon:
-                FlipList.append(Pair(x - i, i + y))
+            if getFromGrid(x + i, y - i) == opponentIcon:
+                FlipList.append(Pair(x + i, y - i))
                 # print(str(i + y)+", "+str(x - i)+" is your opponent's icon")
             # If the tile has your own icon
-            elif getFromGrid(x - i, y + i) == icon:
+            elif getFromGrid(x + i, y - i) == icon:
                 # print(str(i + y)+", "+str(x - i)+" is your icon")
                 # Flip the disks
                 for j in FlipList:
@@ -454,9 +489,9 @@ def checkPoint(x, y, icon, opponentIcon):
         
         FlipList = []
         
-        # Down-Left
-        distY = y
-        distX = x
+        # Up-Left
+        distY = y + 1
+        distX = x + 1
         if distY < distX:
             minimumDistance = distY
         else:
@@ -484,9 +519,9 @@ def checkPoint(x, y, icon, opponentIcon):
         FlipList = []
             
         
-        # Down-Right
-        distY = y
-        distX = 8 - x
+        # Down-left
+        distY = 8 - y
+        distX = x + 1
         if distY < distX:
             minimumDistance = distY
         else:
@@ -495,11 +530,11 @@ def checkPoint(x, y, icon, opponentIcon):
         
         for i in range(1, minimumDistance):
              # If the tile has your opponent's icon
-            if getFromGrid(x + i, y - i) == opponentIcon:
-                FlipList.append(Pair(x + i, y - i))
+            if getFromGrid(x - i, y + i) == opponentIcon:
+                FlipList.append(Pair(x - i, y + i))
                 # print(str(y - i)+", "+str(x + i)+" is your opponent's icon")
             # If the tile has your own icon
-            elif getFromGrid(x + i, y - i) == icon:
+            elif getFromGrid(x - i, y + i) == icon:
                 # print(str(y - i)+", "+str(x + i)+" is your icon")
                 # Flip the disks
                 for j in FlipList:
