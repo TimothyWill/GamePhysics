@@ -48,7 +48,29 @@ def main():
     done = False
     player = "Black"
     while not done:
+        """Check for forfeiting turns"""
+        if (player == "White" and checkAvailableMoves("W", "B") == 0):
+            print("White Turn Forfeited")
+            player = "Black"
+            numberPassed += 1
         
+        if (player == "Black" and checkAvailableMoves("W", "B") == 0):
+            print("Black Turn Forfeited")
+            player = "White"
+            numberPassed += 1
+            
+        """Check for game over"""
+        if numberPassed == 2:
+            print("\nGame Over")
+            print("")
+            done = True
+                        
+            if blackScore > whiteScore:
+                print("\033[4m\nBlack Wins!\n\033[0m")
+            elif whiteScore > blackScore:
+                print("\033[4m\nWhite Wins!\n\033[0m")
+            else:
+                print("\033[4m\nTie\033[0m")
         
         # --- Main event loop
         """ Event Handling """
@@ -70,19 +92,11 @@ def main():
                             numberPassed = 0
                             player = "Black"
                             addToGrid(row, column, "W")
-                        elif (checkAvailableMoves("W", "B") == 0):
-                            print("White Turn Forfeited")
-                            player = "Black"
-                            numberPassed += 1
                     else:
                         if checkPoint(row, column, "B", "W"):
                             numberPassed = 0
                             player = "White"
                             addToGrid(row, column, "B")
-                        elif (checkAvailableMoves("W", "B") == 0):
-                            print("Black Turn Forfeited")
-                            player = "White"
-                            numberPassed += 1
                     
                     print("You have clicked the square:",row + 1,",",column + 1)
                     
@@ -93,19 +107,6 @@ def main():
                                 whiteScore += 1
                             elif getFromGrid(x, y) == "B":
                                 blackScore += 1
-                        
-                    # Check for game over
-                    if numberPassed == 2:
-                        print("\nGame Over")
-                        print("")
-                        done = True
-                        
-                        if blackScore > whiteScore:
-                            print("\033[4m\nBlack Wins!\n\033[0m")
-                        elif whiteScore > blackScore:
-                            print("\033[4m\nWhite Wins!\n\033[0m")
-                        else:
-                            print("\033[4m\nTie\033[0m")
         
         """ State Checking """
         key = pygame.key.get_pressed()
