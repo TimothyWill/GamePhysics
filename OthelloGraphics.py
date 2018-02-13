@@ -19,6 +19,7 @@ OFFWHITE = (235,235,235)
 OFFBLACK = (40,40,40)
 
 grid = []
+validMoves = []
 gameMessage = ""
 
 class Pair:
@@ -61,20 +62,26 @@ def main():
     done = False
     gameOver = False
     player = "Black"
+    global validMoves
+    newTurn = True
     
     while not done:
         """Check for forfeiting turns"""
-        if (player == "White" and checkAvailableMoves("W", "B") == 0 and not gameOver):
+        if (player == "White" and checkAvailableMoves("W", "B") == 0 and newTurn and not gameOver):
             print("White Turn Forfeited")
             updateGameMessage("White Turn Forfeited")
             player = "Black"
             numberPassed += 1
+        else:
+            newTurn = False
         
-        if (player == "Black" and checkAvailableMoves("B", "W") == 0 and not gameOver):
+        if (player == "Black" and checkAvailableMoves("B", "W") == 0 and newTurn and not gameOver):
             print("Black Turn Forfeited")
             updateGameMessage("Black Turn Forfeited")
             player = "White"
             numberPassed += 1
+        else:
+            newTurn = False
             
         """Check for game over"""
         if numberPassed >= 2 and not gameOver:
@@ -112,11 +119,15 @@ def main():
                             numberPassed = 0
                             player = "Black"
                             addToGrid(row, column, "W")
+                            validMoves = []
+                            newTurn = True
                     else:
                         if checkPoint(row, column, "B", "W"):
                             numberPassed = 0
                             player = "White"
                             addToGrid(row, column, "B")
+                            validMoves = []
+                            newTurn = True
                     
                     print("You have clicked the square:",row + 1,",",column + 1)
                     
@@ -131,6 +142,17 @@ def main():
                                 blackScore += 1
         
         """ State Checking """
+        currentPos = pygame.mouse.get_pos()
+        currentColumn = (currentPos[1] - boardOffset) // 25
+        currentRow = (currentPos[0] - boardOffset ) // 25
+        for i in validMoves:
+            if i.x == currentRow and i.y == currentColumn:
+                if player == "White":
+                    addToGrid(currentRow, currentColumn, "HW")
+                else:
+                    addToGrid(currentRow, currentColumn, "HB")
+            else:
+                addToGrid(i.x, i.y, " ")
         
         """Drawing to screen"""
         screen.blit(wood, [0,0])
@@ -160,6 +182,12 @@ def main():
                 elif grid[row][column] == "B":
                     color = BLACK
                     color2 = OFFBLACK
+                elif grid[row][column] == "HW":
+                    color = WHITE
+                    color2 = GRASS
+                elif grid[row][column] == "HB":
+                    color = BLACK
+                    color2 = GRASS
                 pygame.draw.rect(screen, GRASS, [(5+20) * column + boardOffset + 5, 
                                                (5+20) * row + boardOffset + 5,
                                                22, 22])
@@ -189,7 +217,8 @@ def updateGameMessage(message):
     gameMessage = message
     
 def checkAvailableMoves(icon, opponentIcon):
-    
+    global validMoves
+    validMoves = []
     possibleMoves = 0
 
     # Loop through entire grid
@@ -197,7 +226,7 @@ def checkAvailableMoves(icon, opponentIcon):
         for y in range(0, 8):
             validMove = False
             
-            if getFromGrid(x, y) == " ":
+            if getFromGrid(x, y) == " " or getFromGrid(x, y) == "HW" or getFromGrid(x, y) == "HB":
     
                 # Check for Flipping
                 
@@ -361,7 +390,7 @@ def checkAvailableMoves(icon, opponentIcon):
                 FlipList = []
                 
                 if validMove:
-                    #print(y,x)
+                    validMoves.append(Pair(x, y))
                     possibleMoves += 1
     
     return possibleMoves
@@ -371,7 +400,7 @@ def checkPoint(x, y, icon, opponentIcon):
     
     validMove = False
     
-    if getFromGrid(x, y) == " ":
+    if getFromGrid(x, y) == " " or getFromGrid(x, y) == "HW" or getFromGrid(x, y) == "HB":
 
         # Check for Flipping
         
