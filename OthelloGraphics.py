@@ -10,12 +10,16 @@ import pygame
 BLACK    = (   0,   0,   0)
 WHITE    = ( 255, 255, 255)
 GREEN    = (   0, 255,   0)
+GRASS    = ( 20, 200, 0)
 RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
-GRAY     = ( 127, 127, 127)
+GRAY     = ( 50, 50, 50)
 TAN      = ( 210, 180, 140)
+OFFWHITE = (235,235,235)
+OFFBLACK = (40,40,40)
 
 grid = []
+gameMessage = ""
 
 class Pair:
     def __init__(self, pX, pY):
@@ -26,18 +30,27 @@ def main():
     pygame.init()
     font = pygame.font.SysFont('Calibri', 25, True, False)
  
+    #Create window
     width = 255
     height = 255
     screen = pygame.display.set_mode([width,height])
+    pygame.display.set_caption('OTHELLO')
+    background_color = GRAY
 
+    #Create board
     for row in range(8):
         grid.append([])
         for column in range(8):
             grid[row].append(" ")
+
     grid[3][3] = "B"
     grid[3][4] = "W"
     grid[4][3] = "W"
     grid[4][4] = "B"
+    
+    wood = pygame.image.load("wood.jpg")
+    wood = pygame.transform.scale(wood, (255, 255))
+    boardOffset = 25
     
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
@@ -46,31 +59,38 @@ def main():
     whiteScore = 0
     blackScore = 0
     done = False
+    gameOver = False
     player = "Black"
+    
     while not done:
         """Check for forfeiting turns"""
-        if (player == "White" and checkAvailableMoves("W", "B") == 0):
+        if (player == "White" and checkAvailableMoves("W", "B") == 0 and not gameOver):
             print("White Turn Forfeited")
+            updateGameMessage("White Turn Forfeited")
             player = "Black"
             numberPassed += 1
         
-        if (player == "Black" and checkAvailableMoves("W", "B") == 0):
+        if (player == "Black" and checkAvailableMoves("B", "W") == 0 and not gameOver):
             print("Black Turn Forfeited")
+            updateGameMessage("Black Turn Forfeited")
             player = "White"
             numberPassed += 1
             
         """Check for game over"""
-        if numberPassed == 2:
+        if numberPassed >= 2 and not gameOver:
             print("\nGame Over")
             print("")
-            done = True
+            gameOver = True
                         
             if blackScore > whiteScore:
                 print("\033[4m\nBlack Wins!\n\033[0m")
+                updateGameMessage("Black Wins!")
             elif whiteScore > blackScore:
                 print("\033[4m\nWhite Wins!\n\033[0m")
+                updateGameMessage("White Wins!")
             else:
                 print("\033[4m\nTie\033[0m")
+                updateGameMessage("Tie!")
         
         # --- Main event loop
         """ Event Handling """
@@ -82,10 +102,10 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     print("Escape key pressed.")
             # Player clicks a square
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN and not gameOver:
                 pos = pygame.mouse.get_pos()
-                column = pos[1] // 25
-                row = pos[0] // 25
+                column = (pos[1] - boardOffset) // 25
+                row = (pos[0] - boardOffset )// 25
                 if row < 8 and column < 8:
                     if player == "White":
                         if checkPoint(row, column, "W", "B"):
@@ -101,6 +121,8 @@ def main():
                     print("You have clicked the square:",row + 1,",",column + 1)
                     
                     # Update score
+                    whiteScore = 0
+                    blackScore = 0
                     for x in range(0, 8):
                         for y in range(0, 8):
                             if getFromGrid(x, y) == "W":
@@ -109,44 +131,51 @@ def main():
                                 blackScore += 1
         
         """ State Checking """
-        key = pygame.key.get_pressed()
-        if key[pygame.K_SPACE]:
-            print("SPACEBAR!!!")
-            background_color = BLACK
-        else:
-            background_color = BLACK
         
-        # --- Drawing code should go here
-        # First, clear the screen
-        screen.fill(background_color) 
+        """Drawing to screen"""
+        screen.blit(wood, [0,0])
+        pygame.draw.rect(screen, background_color, [26,26,205,205]) 
         # Now, do your drawing.
         
-        #text = font.render(str(pygame.mouse.get_pos()),True, BLACK)
-        #screen.blit(text, [0,0])
+        pygame.draw.circle(screen, WHITE, [65, 15], 10)
+        pygame.draw.circle(screen, OFFWHITE, [165, 15], 8)
+        text = font.render(str(whiteScore),True, WHITE)
+        screen.blit(text, [80,5])
         
+        pygame.draw.circle(screen, BLACK, [165, 15], 10)
+        pygame.draw.circle(screen, OFFBLACK, [165, 15], 8)
+        text = font.render(str(blackScore),True, WHITE)
+        screen.blit(text, [180,5])
         
-
-                
+        text = font.render(str(gameMessage),True, WHITE)
+        screen.blit(text, [0,235])
+        
         for row in range(8):
             for column in range(8):
-                color = TAN
+                color = GRASS
+                color2 = GRASS
                 if grid[row][column] == "W":
                     color = WHITE
+                    color2 = OFFWHITE
                 elif grid[row][column] == "B":
                     color = BLACK
-                pygame.draw.rect(screen, TAN, [(5+20) * column + 5, 
-                                               (5+20) * row + 5,
-                                               20, 20])
-                pygame.draw.circle(screen, color, [(5+10) * column + (10 * column) + 15,
-                                                   (5+10) * row + (10 * row) + 15]
+                    color2 = OFFBLACK
+                pygame.draw.rect(screen, GRASS, [(5+20) * column + boardOffset + 5, 
+                                               (5+20) * row + boardOffset + 5,
+                                               22, 22])
+                pygame.draw.circle(screen, color, [(5+10) * column + (10 * column) + boardOffset + 16,
+                                                   (5+10) * row + (10 * row) + boardOffset + 16]
                                                     ,10)
+                pygame.draw.circle(screen, color2, [(5+10) * column + (10 * column) + boardOffset + 16,
+                                                   (5+10) * row + (10 * row) + boardOffset + 16]
+                                                    ,8)
         
         # --- Update the screen with what we've drawn.
         pygame.display.update()
     
         # This limits the loop to 60 frames per second
         clock.tick(60)
-        
+    
     pygame.quit()
 
 def getFromGrid(rows, columns):
@@ -154,6 +183,10 @@ def getFromGrid(rows, columns):
 
 def addToGrid(x, y, icon):
     grid[y][x] = icon
+    
+def updateGameMessage(message):
+    global gameMessage
+    gameMessage = message
     
 def checkAvailableMoves(icon, opponentIcon):
     
@@ -550,12 +583,15 @@ def checkPoint(x, y, icon, opponentIcon):
         FlipList = []
     else:
         print("Occupied Space")
+        updateGameMessage("Occupied Space")
         return False
     #Break out of the loop if the input is valid
     if validMove:
+        updateGameMessage("")
         return True
     else:
         print("\033[4m\nInvalid Move\033[0m")
+        updateGameMessage("Invalid Move")
         print("Possible Moves: ", checkAvailableMoves(icon, opponentIcon))
         return False
 if __name__ == "__main__":
