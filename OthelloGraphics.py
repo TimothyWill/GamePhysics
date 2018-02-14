@@ -21,6 +21,10 @@ OFFBLACK = (40,40,40)
 grid = []
 validMoves = []
 gameMessage = ""
+newTurn = True
+gameOver = False
+numberPassed = 0
+player = "Black"
 
 class Pair:
     def __init__(self, pX, pY):
@@ -53,18 +57,24 @@ def main():
     wood = pygame.transform.scale(wood, (255, 255))
     boardOffset = 25
     
+    #Create Mouse
+    pygame.mouse.set_visible(False)
+    cursor = pygame.image.load("hand.png")
+    cursor = pygame.transform.scale(cursor, (20, 20))
+    
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
     # -------- Main Program Loop -----------\
-    numberPassed = 0
+    global numberPassed
+    global player
+    global validMoves
+    global newTurn 
+    global gameOver
+    
     whiteScore = 0
     blackScore = 0
     done = False
-    gameOver = False
-    player = "Black"
-    global validMoves
-    newTurn = True
-    
+
     while not done:
         """Check for forfeiting turns"""
         if (player == "White" and checkAvailableMoves("W", "B") == 0 and newTurn and not gameOver):
@@ -72,7 +82,8 @@ def main():
             updateGameMessage("White Turn Forfeited")
             player = "Black"
             numberPassed += 1
-        else:
+            newTurn = True
+        elif player == "White":
             newTurn = False
         
         if (player == "Black" and checkAvailableMoves("B", "W") == 0 and newTurn and not gameOver):
@@ -80,7 +91,8 @@ def main():
             updateGameMessage("Black Turn Forfeited")
             player = "White"
             numberPassed += 1
-        else:
+            newTurn = True
+        elif player == "Black":
             newTurn = False
             
         """Check for game over"""
@@ -155,10 +167,11 @@ def main():
                 addToGrid(i.x, i.y, " ")
         
         """Drawing to screen"""
+        # Background
         screen.blit(wood, [0,0])
         pygame.draw.rect(screen, background_color, [26,26,205,205]) 
-        # Now, do your drawing.
         
+        # Score board
         pygame.draw.circle(screen, WHITE, [65, 15], 10)
         pygame.draw.circle(screen, OFFWHITE, [165, 15], 8)
         text = font.render(str(whiteScore),True, WHITE)
@@ -169,9 +182,11 @@ def main():
         text = font.render(str(blackScore),True, WHITE)
         screen.blit(text, [180,5])
         
+        # Game Messages
         text = font.render(str(gameMessage),True, WHITE)
         screen.blit(text, [0,235])
         
+        #  Game Board and Pieces
         for row in range(8):
             for column in range(8):
                 color = GRASS
@@ -197,6 +212,16 @@ def main():
                 pygame.draw.circle(screen, color2, [(5+10) * column + (10 * column) + boardOffset + 16,
                                                    (5+10) * row + (10 * row) + boardOffset + 16]
                                                     ,8)
+        
+        # Held Piece and Cursor
+        if player == "White":
+            pygame.draw.circle(screen, WHITE, [currentPos[0], currentPos[1]], 10)
+            pygame.draw.circle(screen, OFFWHITE, [currentPos[0], currentPos[1]], 8)
+        else:
+            pygame.draw.circle(screen, BLACK, [currentPos[0], currentPos[1]], 10)
+            pygame.draw.circle(screen, OFFBLACK, [currentPos[0], currentPos[1]], 8)
+            
+        screen.blit(cursor, [currentPos[0], currentPos[1]])
         
         # --- Update the screen with what we've drawn.
         pygame.display.update()
