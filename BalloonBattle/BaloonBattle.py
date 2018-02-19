@@ -34,39 +34,42 @@ def main():
     clock = pygame.time.Clock()
 
     objects = []
-    objects.append(Circle(Vec2d(-1,0), Vec2d(0, 1), 1, 0.05, BLUE))
+    #objects.append(Circle(Vec2d(-1.5,0), Vec2d(1, 1), 1, 0.05, BLUE))
     coords.zoom_at_coords(Vec2d(0,0), 200) 
     # ^ Zoom in 200x, so now the scale is 100 pixels per unit
     # -------- Main Program Loop -----------\
     frame_rate = 60
     playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate
-    done = False
-    while not done:
-        # --- Main event loop
-        for event in pygame.event.get(): 
-            if event.type == pygame.QUIT: # If user clicked close
-                done = True
-               
-        # Physics
-        # Calculate the force on each object
+    
+    def cannon():
+        objects.append(Circle(Vec2d(-1.5,0), Vec2d(1, 1), 1, 0.05, BLUE))
         for obj in objects:
             # Apply Spring Force
             # obj.force = -1 * (obj.pos.get_length() - 0.7) * obj.pos.normalized()
             # obj.force = -(1 * obj.pos.normalized()) / (obj.pos.get_length()**1.9)
             # obj.force = -1 * obj.vel.normalized()
             # obj.force= (-1 * obj.vel.get_length() ** 2) * obj.vel.normalized();
-            
-            obj.force = Vec2d(0, 0.0)
-            
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_w]:
-                break
-                obj.force = Vec2d(0, 8)   
+            r = 0.1
+            obj.force = (r * obj.vel.get_length() ** 2) * obj.vel.normalized();
+            #obj.force = Vec2d(1, 0.0)
             
             # Apply Gravity
             obj.force += Vec2d(0, -1);
         
+    
+    done = False
+    while not done:
+        # --- Main event loop
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT: # If user clicked close
+                done = True
+            if event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_SPACE]:
+                    cannon()
+                
+                
         # Move each object according to physics
         for obj in objects:
             obj.update(dt)
