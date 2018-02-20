@@ -4,6 +4,7 @@ import pygame
 from vec2d import Vec2d
 from coords import Coords
 from circle import Circle
+from Cannon import Cannon
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -39,7 +40,7 @@ def main():
     dt = playback_speed/frame_rate
     
     def cannon():
-        objects.append(Circle(Vec2d(-1.5,0), Vec2d(1, 1), 1, 0.05, RED))
+        objects.append(Cannon(Vec2d(-1.5,0), Vec2d(1, 1), 1, 0.05, RED))
         for obj in objects:
             
             #Air Resistance
@@ -73,7 +74,7 @@ def main():
         screen.blit(draw_screen, (0, 0)) # draw the trail semitransparent
         for obj in objects:
             obj.draw(screen, coords) # draw object to screen
-            obj.draw(draw_screen, coords) # add object to trail in draw_screen
+            #obj.draw(draw_screen, coords) # add object to trail in draw_screen
 
         # --- Update the screen with what we've drawn.
         pygame.display.update()
