@@ -5,6 +5,7 @@ from vec2d import Vec2d
 from coords import Coords
 from circle import Circle
 from Cannon import Cannon
+from Balloon import Balloon
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -29,6 +30,10 @@ def main():
     
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
+
+    # Initialize the balloons
+    LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1, 0), 0.05, BLUE, 9.8, pygame.K_w)
+    RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1, 0), 0.05, BLUE, 9.8, pygame.K_i)
 
     objects = []
     #objects.append(Circle(Vec2d(-1.5,0), Vec2d(1, 1), 1, 0.05, BLUE))
@@ -68,14 +73,22 @@ def main():
         # Move each object according to physics
         for obj in objects:
             obj.update(dt)
+            
+        # Update the balloons
+        LeftBalloon.update(dt)
+        RightBalloon.update(dt)
         
         # Drawing
-        screen.fill(BLACK) # wipe the screen
+        screen.fill(WHITE) # wipe the screen
         screen.blit(draw_screen, (0, 0)) # draw the trail semitransparent
         for obj in objects:
             obj.draw(screen, coords) # draw object to screen
             #obj.draw(draw_screen, coords) # add object to trail in draw_screen
-
+            
+        # Draw the balloons
+        LeftBalloon.draw(screen, coords)
+        RightBalloon.draw(screen, coords)
+        
         # --- Update the screen with what we've drawn.
         pygame.display.update()
     
