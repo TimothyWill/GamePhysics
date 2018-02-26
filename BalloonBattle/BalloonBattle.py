@@ -35,9 +35,12 @@ def main():
 
     # Initialize menu
     startButton = pygame.Rect(250, 300, 300, 50)
+    quitButton = pygame.Rect(250, 400, 300, 50)
+    
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     title = myfont.render('BALLOON FORCE', False, (0, 0, 0))
     play = myfont.render('Play', False, (0, 0, 0))
+    quitGame = myfont.render('Quit', False, (0, 0, 0))
 
     # Initialize the balloons
     LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
@@ -77,6 +80,8 @@ def main():
                 mouse_pos = event.pos  # gets mouse position
 
                 # checks if mouse position is over the button
+                if quitButton.collidepoint(mouse_pos):
+                    exitGame = True
                 if startButton.collidepoint(mouse_pos):
                     done = False
                     while not done:
@@ -129,10 +134,12 @@ def main():
             
         # Draw buttons
         pygame.draw.rect(screen, GRAY, startButton)
+        pygame.draw.rect(screen, GRAY, quitButton)
     
         # Draw Text
         screen.blit(title, (275,100))
         screen.blit(play, (380,300))
+        screen.blit(quitGame, (380,400))
         
         # Draw the balloons
         LeftBalloon.draw(screen, coords)
