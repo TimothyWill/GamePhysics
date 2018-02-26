@@ -44,18 +44,18 @@ def main():
     playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate
     
-    def cannon():
-        objects.append(Cannon(Vec2d(-1.5,0), Vec2d(1, 1), 1, 0.05, RED))
+    def cannon(position, direction):
+        objects.append(Cannon(Vec2d(position), Vec2d(direction), 1, 0.05, RED))
         for obj in objects:
             
             #Air Resistance
             r = 0.1
             
             #Shoot Cannon
-            obj.force = (r * obj.vel.get_length() ** 2) * obj.vel.normalized();
+            obj.force = (r * obj.vel.get_length() ** 2) * obj.vel.normalized();   
             
             # Apply Gravity
-            obj.force += Vec2d(0, -1);
+            obj.force += Vec2d(0, -9.8);
         
     
     done = False
@@ -66,18 +66,25 @@ def main():
                 done = True
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
-                if keys[pygame.K_SPACE]: #Press Space to shoot cannon
-                    cannon()
+                if keys[pygame.K_e]: #Press Space to shoot left cannon
+                    cannon(Vec2d(LeftBalloon.pos.x + (65/200), LeftBalloon.pos.y - (140/200)), Vec2d(3, 3))
+                if keys[pygame.K_u]:
+                    cannon(Vec2d(RightBalloon.pos.x + (60/200), RightBalloon.pos.y - (140/200)), Vec2d(-3, 3))
                 
                 
         # Move each object according to physics
         for obj in objects:
             obj.update(dt)
             
+            # Remove objects off the screen
+            if (obj.pos.y < -2):
+                objects.remove(obj)
+                del obj
+            
         # Update the balloons
         LeftBalloon.update(dt)
         RightBalloon.update(dt)
-        
+
         # Drawing
         screen.fill(WHITE) # wipe the screen
         screen.blit(draw_screen, (0, 0)) # draw the trail semitransparent

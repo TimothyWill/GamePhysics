@@ -4,7 +4,10 @@ from vec2d import Vec2d
 class Balloon:
     
     def __init__(self, pVel, pMass, pPos, pRadius, pColor, pHeat, pUpKey):
-        self.pos = pPos
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("hotairballoon.png")
+        self.image = pygame.transform.scale(self.image, (130, 170))
+        self.pos = Vec2d(pPos.x - (65/200), pPos.y - (85/200))
         self.vel = pVel
         self.mass = pMass
         self.mom = pMass * pVel
@@ -15,7 +18,7 @@ class Balloon:
         self.radius = pRadius
         
     def update(self, dt):
-        print("HEAT: " + str(self.heat))
+        #print("HEAT: " + str(self.heat))
         # lose heat
         self.heat -= self.heatLoss * dt
         # add heat
@@ -48,6 +51,4 @@ class Balloon:
         
         
     def draw(self, screen, coords):
-        pygame.draw.circle(screen, self.color, 
-                           coords.pos_to_screen(self.pos).int(), 
-                           int(coords.scalar_to_screen(self.radius)), 0)
+        screen.blit(self.image,coords.pos_to_screen(self.pos).int())
