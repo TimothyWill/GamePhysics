@@ -10,9 +10,9 @@ from vec2d import Vec2d
 
 class Cannon(pygame.sprite.Sprite):
     def __init__(self, pos, vel, mass, radius, color):
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__()
         self.image = pygame.image.load("cannonball.png")
-        self.image = pygame.transform.scale(self.image, (20, 20))
+        self.image = pygame.transform.scale(self.image, (15, 15))
         self.pos = pos
         self.vel = vel
         self.mass = mass

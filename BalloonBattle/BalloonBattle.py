@@ -3,7 +3,6 @@
 import pygame
 from vec2d import Vec2d
 from coords import Coords
-from circle import Circle
 from Cannon import Cannon
 from Balloon import Balloon
 
@@ -95,9 +94,14 @@ def main():
                                 if keys[pygame.K_e]: #Press Space to shoot left cannon
                                     cannon(Vec2d(LeftBalloon.pos.x + (65/200), LeftBalloon.pos.y - (140/200)), Vec2d(3, 3))
                                 if keys[pygame.K_u]:
-                                    cannon(Vec2d(RightBalloon.pos.x + (60/200), RightBalloon.pos.y - (140/200)), Vec2d(-3, 3))
-                                
-                                
+                                    cannon(Vec2d(RightBalloon.pos.x + (40/200), RightBalloon.pos.y - (140/200)), Vec2d(-3, 3))
+                        
+                        if RightBalloon.pos.y < -1.6 or RightBalloon.pos.y > 2.4:
+                            done = True
+                            
+                        if LeftBalloon.pos.y < -1.6 or LeftBalloon.pos.y > 2.4:
+                            done = True
+                        
                         # Move each object according to physics
                         for obj in objects:
                             obj.update(dt)
@@ -105,7 +109,15 @@ def main():
                             # Remove objects off the screen
                             if (obj.pos.y < -2):
                                 objects.remove(obj)
-                                del obj
+                                del obj   
+                            elif obj.pos.x > 1.2 and obj.pos.x < 1.8 and obj.pos.y < RightBalloon.pos.y and obj.pos.y > RightBalloon.pos.y - (85/200):
+                                objects.remove(obj)
+                                del obj 
+                                RightBalloon.heatLoss += 1
+                            elif obj.pos.x < -1.2 and obj.pos.x > -1.8 and obj.pos.y < LeftBalloon.pos.y and obj.pos.y > LeftBalloon.pos.y - (85/200):
+                                objects.remove(obj)
+                                del obj 
+                                LeftBalloon.heatLoss += 1
                             
                         # Update the balloons
                         LeftBalloon.update(dt)
@@ -128,6 +140,11 @@ def main():
                     
                         # This limits the loop to 60 frames per second
                         clock.tick(frame_rate)
+                        
+                        if done:
+                            LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
+                            RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
+                            RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
               
         # Draw background
         screen.blit(background, (0,0))
