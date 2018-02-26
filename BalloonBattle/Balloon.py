@@ -24,7 +24,7 @@ class Balloon:
         # add heat
         keys = pygame.key.get_pressed()
         if keys[self.upKey]:
-            print("Button Pressed")
+           # print("Button Pressed")
             self.heat += dt * 6;
         else:
             self.heat -= dt;

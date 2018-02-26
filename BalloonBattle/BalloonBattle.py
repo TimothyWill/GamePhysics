@@ -17,6 +17,8 @@ GRAY     = ( 127, 127, 127)
 
 def main():
     pygame.init()
+    background = pygame.image.load("background.jpg")
+    background = pygame.transform.scale(background, (800, 600))
  
     width = 800
     height = 600
@@ -32,8 +34,9 @@ def main():
     clock = pygame.time.Clock()
 
     # Initialize the balloons
-    LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1, 0), 0.05, BLUE, 9.8, pygame.K_w)
-    RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1, 0), 0.05, BLUE, 9.8, pygame.K_i)
+    LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1.5, 0), 0.05, BLUE, 9.8, pygame.K_w)
+    RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1.5, 0), 0.05, BLUE, 9.8, pygame.K_i)
+    RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
 
     objects = []
     #objects.append(Circle(Vec2d(-1.5,0), Vec2d(1, 1), 1, 0.05, BLUE))
@@ -88,6 +91,7 @@ def main():
         # Drawing
         screen.fill(WHITE) # wipe the screen
         screen.blit(draw_screen, (0, 0)) # draw the trail semitransparent
+        screen.blit(background, (0,0))
         for obj in objects:
             obj.draw(screen, coords) # draw object to screen
             #obj.draw(draw_screen, coords) # add object to trail in draw_screen
