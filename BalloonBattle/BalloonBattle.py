@@ -46,8 +46,12 @@ def main():
     RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
     RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
 
-    #Cannon ball collector
+    #Cannon balls
     objects = []
+    leftCharge = False
+    rightCharge = False
+    leftCannonPower = 0
+    rightCannonPower = 0
 
     coords.zoom_at_coords(Vec2d(0,0), 200) 
     # ^ Zoom in 200x, so now the scale is 100 pixels per unit
@@ -91,11 +95,27 @@ def main():
                                 exitGame = True
                             if event.type == pygame.KEYDOWN:
                                 keys = pygame.key.get_pressed()
-                                if keys[pygame.K_e]: #Press Space to shoot left cannon
-                                    cannon(Vec2d(LeftBalloon.pos.x + (65/200), LeftBalloon.pos.y - (140/200)), Vec2d(3, 3))
+                                if keys[pygame.K_e]: 
+                                    leftCharge = True
                                 if keys[pygame.K_u]:
-                                    cannon(Vec2d(RightBalloon.pos.x + (40/200), RightBalloon.pos.y - (140/200)), Vec2d(-3, 3))
+                                    rightCharge = True
+                            if event.type == pygame.KEYUP:
+                                keys = pygame.key.get_pressed()
+                                if leftCannonPower > 0 and not keys[pygame.K_e]: 
+                                    cannon(Vec2d(LeftBalloon.pos.x + (90/200), LeftBalloon.pos.y - (130/200)), Vec2d(leftCannonPower,leftCannonPower))
+                                    leftCharge = False
+                                    leftCannonPower = 0
+                                if rightCannonPower > 0 and not keys[pygame.K_u]:
+                                    cannon(Vec2d(RightBalloon.pos.x + (30/200), RightBalloon.pos.y - (130/200)), Vec2d(-rightCannonPower, rightCannonPower))
+                                    rightCharge = False
+                                    rightCannonPower = 0
                         
+                        if leftCharge:
+                            leftCannonPower += .05
+                        if rightCharge:
+                            rightCannonPower += .05
+                        
+                        # Balloons out of bounds
                         if RightBalloon.pos.y < -1.6 or RightBalloon.pos.y > 2.4:
                             done = True
                             
@@ -129,7 +149,6 @@ def main():
                         # Draw cannon balls
                         for obj in objects:
                             obj.draw(screen, coords) # draw object to screen
-                            #obj.draw(draw_screen, coords) # add object to trail in draw_screen
                             
                         # Draw the balloons
                         LeftBalloon.draw(screen, coords)
@@ -141,10 +160,12 @@ def main():
                         # This limits the loop to 60 frames per second
                         clock.tick(frame_rate)
                         
+                        # Reset balloons and cannons
                         if done:
                             LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
                             RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
                             RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
+                            objects = []
               
         # Draw background
         screen.blit(background, (0,0))
