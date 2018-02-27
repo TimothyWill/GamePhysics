@@ -42,8 +42,8 @@ def main():
     quitGame = myfont.render('Quit', False, (0, 0, 0))
 
     # Initialize the balloons
-    LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
-    RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
+    LeftBalloon  = Balloon(Vec2d(0, 0), 80, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
+    RightBalloon = Balloon(Vec2d(0, 0), 80, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
     RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
 
     #Cannon balls
