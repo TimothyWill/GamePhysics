@@ -4,9 +4,10 @@ from vec2d import Vec2d
 class Balloon:
     
     def __init__(self, pVel, pMass, pPos, pRadius, pColor, pAir, pUpKey):
+        super().__init__()
         self.image = pygame.image.load("hotairballoon.png")
         self.image = pygame.transform.scale(self.image, (130, 170))
-        self.pos = pPos
+        self.pos = Vec2d(pPos.x - (65/200), pPos.y - (85/200))
         self.vel = pVel
         self.mass = pMass
         self.mom = pMass * pVel
@@ -75,9 +76,7 @@ class Balloon:
         self.force = Vec2d(0, (self.outsideDensity - self.insideDensity) * 100)
     
     def draw(self, screen, coords):
-        pygame.draw.circle(screen, self.color, 
-                           coords.pos_to_screen(self.pos).int(), 
-                           int(coords.scalar_to_screen(self.radius)), 0)
+        screen.blit(self.image,coords.pos_to_screen(self.pos).int())
         
         
         

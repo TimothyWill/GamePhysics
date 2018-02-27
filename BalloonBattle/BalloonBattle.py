@@ -4,7 +4,7 @@ import pygame
 from vec2d import Vec2d
 from coords import Coords
 from Cannon import Cannon
-from Balloon2 import Balloon
+from Balloon import Balloon
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -42,8 +42,8 @@ def main():
     quitGame = myfont.render('Quit', False, (0, 0, 0))
 
     # Initialize the balloons
-    LeftBalloon  = Balloon(Vec2d(0, 0), 80, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
-    RightBalloon = Balloon(Vec2d(0, 0), 80, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
+    LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
+    RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
     RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
 
     #Cannon balls
@@ -133,11 +133,11 @@ def main():
                             elif obj.pos.x > 1.2 and obj.pos.x < 1.8 and obj.pos.y < RightBalloon.pos.y and obj.pos.y > RightBalloon.pos.y - (85/200):
                                 objects.remove(obj)
                                 del obj 
-                                RightBalloon.heatLoss += 1
+                                RightBalloon.airLoss += 1
                             elif obj.pos.x < -1.2 and obj.pos.x > -1.8 and obj.pos.y < LeftBalloon.pos.y and obj.pos.y > LeftBalloon.pos.y - (85/200):
                                 objects.remove(obj)
                                 del obj 
-                                LeftBalloon.heatLoss += 1
+                                LeftBalloon.airLoss += 1
                             
                         # Update the balloons
                         LeftBalloon.update(dt)
