@@ -30,7 +30,7 @@ class Balloon:
         # add air
         keys = pygame.key.get_pressed()
         if keys[self.upKey]:
-            print("Button Pressed")
+            #print("Button Pressed")
             self.addHeat(dt)
             
         # calculate density
@@ -49,14 +49,14 @@ class Balloon:
         
     def loseHeat(self, dt):
         self.insideTemp -= -self.heatLossConstant * (self.outsideTemp - self.insideTemp) * dt
-        print ("Temperature: " + str(self.insideTemp))
+        #print ("Temperature: " + str(self.insideTemp))
 
     def addHeat(self, dt):
         self.insideTemp += self.lampTemp * dt
         
     def calculateDensity(self):
         self.insideDensity = self.outsideTemp * self.outsideDensity / self.insideTemp
-        print("Density: " + str(self.insideDensity))
+        #print("Density: " + str(self.insideDensity))
 
     def calculateBuoyantForce(self):
         self.force = Vec2d(0, (self.outsideDensity - self.insideDensity) * 100)        

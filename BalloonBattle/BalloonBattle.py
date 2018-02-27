@@ -13,6 +13,7 @@ GREEN    = (   0, 255,   0)
 RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
+CLEARGRAY     = ( 127, 127, 127, 10)
 
 def main():
     pygame.init()
@@ -33,13 +34,17 @@ def main():
     clock = pygame.time.Clock()
 
     # Initialize menu
-    startButton = pygame.Rect(250, 300, 300, 50)
+    startButton = pygame.Rect(250, 200, 300, 50)
+    controlsButton = pygame.Rect(250, 300, 300, 50)
     quitButton = pygame.Rect(250, 400, 300, 50)
+    backButton = pygame.Rect(250, 500, 300, 50)
     
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     title = myfont.render('BALLOON FORCE', False, (0, 0, 0))
     play = myfont.render('Play', False, (0, 0, 0))
+    controls = myfont.render('Controls', False, (0, 0, 0))
     quitGame = myfont.render('Quit', False, (0, 0, 0))
+    back = myfont.render('Back', False, (0, 0, 0))
 
     # Initialize the balloons
     LeftBalloon  = Balloon(Vec2d(0, 0), 200, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
@@ -85,6 +90,55 @@ def main():
                 # checks if mouse position is over the button
                 if quitButton.collidepoint(mouse_pos):
                     exitGame = True
+                if controlsButton.collidepoint(mouse_pos):
+                    player1 = myfont.render('Player 1', False, (0, 0, 0))
+                    player2 = myfont.render('Player 2', False, (0, 0, 0))
+                    elevate = myfont.render('Elevate', False, (0, 0, 0))
+                    fire = myfont.render('Fire', False, (0, 0, 0))
+                    wText = myfont.render('W', False, (0, 0, 0))
+                    eText = myfont.render('E', False, (0, 0, 0))
+                    iText = myfont.render('I', False, (0, 0, 0))
+                    uText = myfont.render('U', False, (0, 0, 0))
+                    controlsDone = False
+                    while not controlsDone:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT: # If user clicked close
+                                controlsDone = True
+                                exitGame = True
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                mouse_pos = event.pos
+                                
+                                if backButton.collidepoint(mouse_pos):
+                                    controlsDone = True
+                        # Draw
+                        screen.blit(background, (0,0))
+                        screen.blit(title, (275,100))
+                        
+                        LeftBalloon.draw(screen, coords)
+                        RightBalloon.draw(screen, coords)
+                        
+                        pygame.draw.rect(screen, GRAY, backButton)
+                        screen.blit(back, (370,500))
+                        
+                        screen.blit(player1, (200, 150))
+                        screen.blit(player2, (500, 150))
+                        
+                        screen.fill(CLEARGRAY, pygame.Rect(200, 250, 400, 50), pygame.BLEND_MAX)
+                        screen.fill(CLEARGRAY, pygame.Rect(200, 350, 400, 50), pygame.BLEND_MAX)
+                        
+                        screen.blit(elevate, (350, 250))
+                        screen.blit(fire, (370, 350))
+                        
+                        screen.blit(wText, (230, 250))
+                        screen.blit(eText, (230, 350))
+                        screen.blit(iText, (550, 250))
+                        screen.blit(uText, (550, 350))
+                        
+                        # --- Update the screen with what we've drawn.
+                        pygame.display.update()
+                    
+                        # This limits the loop to 60 frames per second
+                        clock.tick(frame_rate)
                 if startButton.collidepoint(mouse_pos):
                     done = False
                     while not done:
@@ -110,9 +164,9 @@ def main():
                                     rightCharge = False
                                     rightCannonPower = 0
                         
-                        if leftCharge:
+                        if leftCharge and leftCannonPower < 5:
                             leftCannonPower += .05
-                        if rightCharge:
+                        if rightCharge and rightCannonPower < 5:
                             rightCannonPower += .05
                         
                         # Balloons out of bounds
@@ -154,6 +208,15 @@ def main():
                         LeftBalloon.draw(screen, coords)
                         RightBalloon.draw(screen, coords)
                         
+                        # Draw UI
+                        if leftCharge:
+                            pygame.draw.rect(screen, RED, pygame.Rect(50, -LeftBalloon.pos.y * 200 + 475, 20 * leftCannonPower, 20))
+                            pygame.draw.rect(screen, BLACK, pygame.Rect(50, -LeftBalloon.pos.y * 200 + 475, 100, 20),5)
+
+                        if rightCharge:
+                            pygame.draw.rect(screen, RED, pygame.Rect(650, -RightBalloon.pos.y * 200 + 475, 20 * rightCannonPower, 20))
+                            pygame.draw.rect(screen, BLACK, pygame.Rect(650, -RightBalloon.pos.y * 200 + 475, 100, 20),5)
+                        
                         # --- Update the screen with what we've drawn.
                         pygame.display.update()
                     
@@ -162,8 +225,8 @@ def main():
                         
                         # Reset balloons and cannons
                         if done:
-                            LeftBalloon  = Balloon(Vec2d(0, 0), 30, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
-                            RightBalloon = Balloon(Vec2d(0, 0), 30, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
+                            LeftBalloon  = Balloon(Vec2d(0, 0), 200, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
+                            RightBalloon = Balloon(Vec2d(0, 0), 200, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
                             RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
                             objects = []
               
@@ -172,12 +235,14 @@ def main():
             
         # Draw buttons
         pygame.draw.rect(screen, GRAY, startButton)
+        pygame.draw.rect(screen, GRAY, controlsButton)
         pygame.draw.rect(screen, GRAY, quitButton)
     
         # Draw Text
         screen.blit(title, (275,100))
-        screen.blit(play, (380,300))
-        screen.blit(quitGame, (380,400))
+        screen.blit(play, (370,200))
+        screen.blit(controls, (340,300))
+        screen.blit(quitGame, (370,400))
         
         # Draw the balloons
         LeftBalloon.draw(screen, coords)
