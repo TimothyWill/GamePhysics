@@ -42,8 +42,8 @@ def main():
     quitGame = myfont.render('Quit', False, (0, 0, 0))
 
     # Initialize the balloons
-    LeftBalloon  = Balloon(Vec2d(0, 0), 80, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
-    RightBalloon = Balloon(Vec2d(0, 0), 80, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
+    LeftBalloon  = Balloon(Vec2d(0, 0), 200, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
+    RightBalloon = Balloon(Vec2d(0, 0), 200, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
     RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
 
     #Cannon balls
@@ -133,11 +133,11 @@ def main():
                             elif obj.pos.x > 1.2 and obj.pos.x < 1.8 and obj.pos.y < RightBalloon.pos.y and obj.pos.y > RightBalloon.pos.y - (85/200):
                                 objects.remove(obj)
                                 del obj 
-                                RightBalloon.airLoss += 1
+                                RightBalloon.getHit()
                             elif obj.pos.x < -1.2 and obj.pos.x > -1.8 and obj.pos.y < LeftBalloon.pos.y and obj.pos.y > LeftBalloon.pos.y - (85/200):
                                 objects.remove(obj)
                                 del obj 
-                                LeftBalloon.airLoss += 1
+                                LeftBalloon.getHit()
                             
                         # Update the balloons
                         LeftBalloon.update(dt)

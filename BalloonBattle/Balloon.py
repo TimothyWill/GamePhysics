@@ -3,8 +3,8 @@ from vec2d import Vec2d
 
 class Balloon:
     
-    def __init__(self, pVel, pMass, pPos, pRadius, pColor, pAir, pUpKey):
-        super().__init__()
+    def __init__(self, pVel, pMass, pPos, pRadius, pColor, pHeat, pUpKey):
+        pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("hotairballoon.png")
         self.image = pygame.transform.scale(self.image, (130, 170))
         self.pos = Vec2d(pPos.x - (65/200), pPos.y - (85/200))
@@ -12,7 +12,6 @@ class Balloon:
         self.mass = pMass
         self.mom = pMass * pVel
         self.color = pColor
-        self.air = pAir
         self.airLoss = 3
         self.upKey = pUpKey
         self.radius = pRadius
@@ -23,13 +22,8 @@ class Balloon:
         self.insideDensity = 1
         self.outsideDensity = 1
         self.lampTemp = 100
-
         
     def update(self, dt):
-        # lose air
-        self.air -= self.airLoss * dt
-        
-        
         # lose temp to heat
         self.loseHeat(dt)
         
@@ -37,19 +31,11 @@ class Balloon:
         keys = pygame.key.get_pressed()
         if keys[self.upKey]:
             print("Button Pressed")
-            self.air += dt * 6;
             self.addHeat(dt)
-        else:
-            self.air -= dt
-    
+            
         # calculate density
         self.calculateDensity()
 
-        # Check air amount
-        if self.air <= 5:
-            self.air = 5  
-        elif self.air >= 13:
-            self.air = 13
         
         self.calculateBuoyantForce()
         print(self.force)
@@ -73,11 +59,10 @@ class Balloon:
         print("Density: " + str(self.insideDensity))
 
     def calculateBuoyantForce(self):
-        self.force = Vec2d(0, (self.outsideDensity - self.insideDensity) * 100)
-    
+        self.force = Vec2d(0, (self.outsideDensity - self.insideDensity) * 100)        
+        
+    def getHit(self):
+        self.heatLossConstant += 1.0
+        
     def draw(self, screen, coords):
         screen.blit(self.image,coords.pos_to_screen(self.pos).int())
-        
-        
-        
-        
