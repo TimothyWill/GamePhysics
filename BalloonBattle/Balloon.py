@@ -7,6 +7,8 @@ class Balloon:
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("hotairballoon.png")
         self.image = pygame.transform.scale(self.image, (130, 170))
+        self.fire = pygame.image.load("fire.png")
+        self.fire = pygame.transform.scale(self.fire, (130, 170))
         self.pos = Vec2d(pPos.x - (65/200), pPos.y - (85/200))
         self.vel = pVel
         self.mass = pMass
@@ -22,6 +24,7 @@ class Balloon:
         self.insideDensity = 1
         self.outsideDensity = 1
         self.lampTemp = 100
+        self.onFire = False
         
     def update(self, dt):
         # lose temp to heat
@@ -32,6 +35,9 @@ class Balloon:
         if keys[self.upKey]:
             #print("Button Pressed")
             self.addHeat(dt)
+            self.onFire = True
+        else:
+            self.onFire = False
             
         # calculate density
         self.calculateDensity()
@@ -65,4 +71,6 @@ class Balloon:
         self.heatLossConstant += 1.0
         
     def draw(self, screen, coords):
+        if self.onFire:
+            screen.blit(self.fire,coords.pos_to_screen(self.pos).int())
         screen.blit(self.image,coords.pos_to_screen(self.pos).int())

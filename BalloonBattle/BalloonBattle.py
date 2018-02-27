@@ -18,7 +18,7 @@ CLEARGRAY     = ( 127, 127, 127, 10)
 def main():
     pygame.init()
     
-    #Import background
+    #Import images
     background = pygame.image.load("background.jpg")
     background = pygame.transform.scale(background, (800, 600))
  
@@ -50,6 +50,7 @@ def main():
     LeftBalloon  = Balloon(Vec2d(0, 0), 200, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
     RightBalloon = Balloon(Vec2d(0, 0), 200, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
     RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
+    RightBalloon.fire = pygame.transform.flip(RightBalloon.fire, True, False)
 
     #Cannon balls
     objects = []
@@ -228,6 +229,7 @@ def main():
                             LeftBalloon  = Balloon(Vec2d(0, 0), 200, Vec2d(-1.5, 1), 0.05, BLUE, 9.8, pygame.K_w)
                             RightBalloon = Balloon(Vec2d(0, 0), 200, Vec2d(1.5, 1), 0.05, BLUE, 9.8, pygame.K_i)
                             RightBalloon.image = pygame.transform.flip(RightBalloon.image, True, False)
+                            RightBalloon.fire = pygame.transform.flip(RightBalloon.fire, True, False)
                             objects = []
               
         # Draw background
