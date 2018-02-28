@@ -50,6 +50,9 @@ def main():
     zoom = 100
     coords.zoom_at_coords(Vec2d(0,0), zoom) 
     
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
+    pauseText = myfont.render('Paused', False, (0, 0, 0))
+    
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
 
@@ -71,30 +74,45 @@ def main():
     playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate
     print("timestep =", dt)
+    
+    pause = False
     done = False
     while not done:
         # --- Main event loop
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: # If user clicked close
                 done = True
-               
-        # Physics
-        # Calculate the force on each object
-        for obj in objects:
-            obj.force.zero()
-        for i1, obj1 in enumerate(objects):
-            for i2, obj2 in enumerate(objects):
-                if i1 < i2:
-                    gravity_force(obj1, obj2)
+            if event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_SPACE]: 
+                    pause = not pause
         
-        # Move each object according to physics
-        for obj in objects:
-            obj.update(dt)
-        
-        # Drawing
-        screen.fill(WHITE) # wipe the screen
-        for obj in objects:
-            obj.draw(screen, coords) # draw object to screen
+        if pause:
+            # Drawing
+            screen.fill(WHITE) # wipe the screen
+            for obj in objects:
+                obj.draw(screen, coords) # draw object to screen
+                
+            screen.fill(GRAY, pygame.Rect(300, 200, 200, 50), pygame.BLEND_ADD)
+            screen.blit(pauseText, (350, 200))
+        else:
+            # Physics
+            # Calculate the force on each object
+            for obj in objects:
+                obj.force.zero()
+            for i1, obj1 in enumerate(objects):
+                for i2, obj2 in enumerate(objects):
+                    if i1 < i2:
+                        gravity_force(obj1, obj2)
+            
+            # Move each object according to physics
+            for obj in objects:
+                obj.update(dt)
+            
+            # Drawing
+            screen.fill(WHITE) # wipe the screen
+            for obj in objects:
+                obj.draw(screen, coords) # draw object to screen
 
         # --- Update the screen with what we've drawn.
         pygame.display.update()
