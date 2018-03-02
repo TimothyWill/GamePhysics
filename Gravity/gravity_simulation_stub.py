@@ -9,6 +9,7 @@ from vec2d import Vec2d
 from coords import Coords
 from circle import Circle
 from random import uniform, randint, random
+from slider import Slider
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -17,6 +18,8 @@ GREEN    = (   0, 255,   0)
 RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
+
+massSlider = Slider(30, 100, 30, (30, 80), (300, 5))
 
 def random_color():
     return (randint(0,255), randint(0,255), randint(0,255))
@@ -91,10 +94,16 @@ def main():
         for obj in objects:
             obj.update(dt)
         
+        # Update the slider
+        massSlider.update()
+        
         # Drawing
         screen.fill(WHITE) # wipe the screen
         for obj in objects:
             obj.draw(screen, coords) # draw object to screen
+
+        # Draw the Sliders
+        massSlider.draw(screen)
 
         # --- Update the screen with what we've drawn.
         pygame.display.update()
