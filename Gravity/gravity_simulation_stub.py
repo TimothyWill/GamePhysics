@@ -18,6 +18,20 @@ RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
 
+def center(objects):
+    mass = 0
+    rmass = 0
+    
+    for i1, obj1 in enumerate(objects):
+        r = obj1.pos
+        rmass += r * obj1.mass
+        mass += obj1.mass
+    
+    centerMass = rmass/mass
+    print(centerMass)
+    for obj in objects:
+        obj.pos = centerMass - obj.pos
+
 def random_color():
     return (randint(0,255), randint(0,255), randint(0,255))
 
@@ -86,6 +100,8 @@ def main():
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_SPACE]: 
                     pause = not pause
+                if keys[pygame.K_0]:
+                    center(objects)
         
         if pause:
             # Drawing
