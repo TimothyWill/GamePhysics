@@ -33,11 +33,17 @@ def random_bright_color():
 def gravity_force(obj1, obj2):
     """ compute the force on each object
         add to each, equal and opposite """
-    r = obj1.pos - obj2.pos
-    force = -1*r # this isn't the right formula
+    r = obj1.pos - obj2.pos # distance between two objects
+    m1 = obj1.mass # mass of 1st object
+    m2 = obj2.mass # mass of 2nd object
+    G = 1 #6.67384*(10**(-11)) # gravitational constant
+    if r.mag() > (obj1.radius + obj2.radius):
+        force = -((G*m1*m2)/r.mag2())*r.hat() # this is the formula for gravity
+    else:
+        force = 1*(r.mag()-obj1.radius)*r.hat() # this is the formula for repulsion
+    
     obj1.force += force
     obj2.force -= force
-    return
 
 def main():
     pygame.init()
@@ -47,7 +53,7 @@ def main():
     screen = pygame.display.set_mode([width,height])
     screen_center = Vec2d(width/2, height/2)
     coords = Coords(screen_center.copy(), 1, True)
-    zoom = 100
+    zoom = 80
     coords.zoom_at_coords(Vec2d(0,0), zoom) 
     
     # Used to manage how fast the screen updates
