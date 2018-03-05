@@ -9,6 +9,7 @@ from vec2d import Vec2d
 from coords import Coords
 from circle import Circle
 from random import uniform, randint, random
+from slider import Slider
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -17,6 +18,8 @@ GREEN    = (   0, 255,   0)
 RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
+
+massSlider = Slider(30, 100, 30, (30, 80), (300, 5))
 
 def center(objects):
     mass = 0
@@ -47,11 +50,17 @@ def random_bright_color():
 def gravity_force(obj1, obj2):
     """ compute the force on each object
         add to each, equal and opposite """
-    r = obj1.pos - obj2.pos
-    force = -1*r # this isn't the right formula
+    r = obj1.pos - obj2.pos # distance between two objects
+    m1 = obj1.mass # mass of 1st object
+    m2 = obj2.mass # mass of 2nd object
+    G = 1 #6.67384*(10**(-11)) # gravitational constant
+    if r.mag() > (obj1.radius + obj2.radius):
+        force = -((G*m1*m2)/r.mag2())*r.hat() # this is the formula for gravity
+    else:
+        force = 1*(r.mag()-obj1.radius)*r.hat() # this is the formula for repulsion
+    
     obj1.force += force
     obj2.force -= force
-    return
 
 def main():
     pygame.init()
@@ -61,7 +70,7 @@ def main():
     screen = pygame.display.set_mode([width,height])
     screen_center = Vec2d(width/2, height/2)
     coords = Coords(screen_center.copy(), 1, True)
-    zoom = 100
+    zoom = 80
     coords.zoom_at_coords(Vec2d(0,0), zoom) 
     
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
@@ -102,8 +111,10 @@ def main():
                     pause = not pause
                 if keys[pygame.K_0]:
                     center(objects)
-        
+
         if pause:
+            # Update Slider
+            massSlider.update()
             # Drawing
             screen.fill(WHITE) # wipe the screen
             for obj in objects:
@@ -125,10 +136,15 @@ def main():
             for obj in objects:
                 obj.update(dt)
             
+            # Update the slider
+            massSlider.update()
             # Drawing
             screen.fill(WHITE) # wipe the screen
             for obj in objects:
                 obj.draw(screen, coords) # draw object to screen
+
+        # Draw the Sliders
+        massSlider.draw(screen)
 
         # --- Update the screen with what we've drawn.
         pygame.display.update()
