@@ -19,7 +19,7 @@ RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
 
-massSlider = Slider(30, 100, 30, (30, 80), (300, 5))
+massSlider = Slider(0.3, 0.8, 30, (30, 80), (300, 5))
 
 def random_color():
     return (randint(0,255), randint(0,255), randint(0,255))
@@ -40,6 +40,16 @@ def gravity_force(obj1, obj2):
     force = -1*r # this isn't the right formula
     obj1.force += force
     obj2.force -= force
+    return
+
+def addNewBall(width, height, objects, zoom, position, coords):
+    print("Adding a new Ball")
+    radius = massSlider.getValue()
+    radius = uniform(0.3, 0.8)
+    mass = radius*radius*20
+    objects.append(Circle(coords.pos_to_coords(position), 2*Vec2d(uniform(-1,1), uniform(-1,1)),
+                              mass, radius, random_bright_color()))
+    print("Position: " + str(objects[len(objects) - 1].pos))
     return
 
 def main():
@@ -71,6 +81,7 @@ def main():
                                     height/zoom*uniform(-0.5,0.5)),
                               2*Vec2d(uniform(-1,1), uniform(-1,1)),
                               mass, radius, random_bright_color()))
+        print("Position: " + str(objects[len(objects) - 1].pos))
 
     # -------- Main Program Loop -----------\
     frame_rate = 60
@@ -82,6 +93,7 @@ def main():
     done = False
     while not done:
         # --- Main event loop
+        
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: # If user clicked close
                 done = True
@@ -89,6 +101,9 @@ def main():
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_SPACE]: 
                     pause = not pause
+            # Add a new ball
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                addNewBall(width, height, objects, zoom, pygame.mouse.get_pos(), coords)
     
         if pause:
             # Update Slider
@@ -100,7 +115,7 @@ def main():
                 
             screen.fill(GRAY, pygame.Rect(300, 200, 200, 50), pygame.BLEND_ADD)
             screen.blit(pauseText, (350, 200))
-        else:
+        else:            
             # Physics
             # Calculate the force on each object
             for obj in objects:
