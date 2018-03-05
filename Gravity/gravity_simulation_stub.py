@@ -24,16 +24,20 @@ massSlider = Slider(30, 100, 30, (30, 80), (300, 5))
 def center(objects):
     mass = 0
     rmass = 0
+    vmass = 0
     
     for i1, obj1 in enumerate(objects):
         r = obj1.pos
         rmass += r * obj1.mass
         mass += obj1.mass
+        vmass += obj1.vel * obj1.mass
     
     centerMass = rmass/mass
+    centerVelocity = vmass/mass
     print(centerMass)
     for obj in objects:
         obj.pos = centerMass - obj.pos
+        obj.vel = obj.vel - centerVelocity
 
 def random_color():
     return (randint(0,255), randint(0,255), randint(0,255))
