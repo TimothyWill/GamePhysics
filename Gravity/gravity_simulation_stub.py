@@ -36,7 +36,7 @@ def center(objects):
     centerVelocity = vmass/mass
     print(centerMass)
     for obj in objects:
-        obj.pos = centerMass - obj.pos
+        obj.pos = obj.pos - centerMass
         obj.vel = obj.vel - centerVelocity
 
 def random_color():
