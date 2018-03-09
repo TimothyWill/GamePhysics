@@ -18,7 +18,9 @@ RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
 
+# The slider to enter the mass of new objects
 massSlider = Slider(0.3, 0.8, 30, (30, 80), (300, 5))
+
 
 def center(objects):
     mass = 0
@@ -38,9 +40,11 @@ def center(objects):
         obj.pos = obj.pos - centerMass
         obj.vel = obj.vel - centerVelocity
 
+# Return a random color
 def random_color():
     return (randint(0,255), randint(0,255), randint(0,255))
 
+# return a random bright color
 def random_bright_color():
     i = randint(0,2)
     d = randint(1,2)
@@ -50,6 +54,7 @@ def random_bright_color():
     color[(i+d)%3] = c
     return color
 
+# apply gravity between the two objects
 def gravity_force(obj1, obj2):
     """ compute the force on each object
         add to each, equal and opposite """
@@ -65,17 +70,21 @@ def gravity_force(obj1, obj2):
     obj1.force += force
     obj2.force -= force
 
-def addNewBall(width, height, objects, zoom, position, coords):
-    print("Adding a new Ball")
+# Add a new circle to the scene
+def addNewBall(width, height, objects, zoom, position, coords, velocity):
+    # Get the radius of the ball from the slider
     radius = massSlider.getValue()
-    radius = uniform(0.3, 0.8)
+    # Calculate the mass based on the radius
     mass = radius*radius*20
-    objects.append(Circle(coords.pos_to_coords(position), 2*Vec2d(uniform(-1,1), uniform(-1,1)),
+    # Add the circle to the array
+    objects.append(Circle(coords.pos_to_coords(position), velocity,
                               mass, radius, random_bright_color()))
-    print("Position: " + str(objects[len(objects) - 1].pos))
-    return
 
 def main():
+    # Variable where the position where the new ball will be placed is stored
+    mouseDownPosition = Vec2d(-1, -1);
+    
+    # initialize pygame
     pygame.init()
  
     width = 800
@@ -117,18 +126,29 @@ def main():
     while not done:
         # --- Main event loop
         
+        # Add new Circles
+        # check if the user is pressing the mouse button
+        if pygame.mouse.get_pressed()[0] and mouseDownPosition.x == -1:
+            # Set mouseDownPosition to the currernt position
+            mouseDownPosition = Vec2d(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+        # When the user releases the mouse button
+        elif pygame.mouse.get_pressed()[0] == False and mouseDownPosition.x != -1:
+            # Calculate the velocity based on the distance between the two mouse positions
+            newVelocityX = (mouseDownPosition.x - pygame.mouse.get_pos()[0]) * -0.05
+            newVelocityY = (mouseDownPosition.y - pygame.mouse.get_pos()[1]) * 0.05
+            # Create the new ball
+            addNewBall(width, height, objects, zoom, mouseDownPosition, coords, Vec2d(newVelocityX, newVelocityY))
+            mouseDownPosition = Vec2d(-1, -1)
+        
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: # If user clicked close
                 done = True
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
-                if keys[pygame.K_SPACE]: 
+                if keys[pygame.K_SPACE]: # If the user pressed space, pause/unpause
                     pause = not pause
-                if keys[pygame.K_0]:
+                if keys[pygame.K_0]: # If the user pressed zero, center the camera
                     center(objects)
-            # Add a new ball
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                addNewBall(width, height, objects, zoom, pygame.mouse.get_pos(), coords)
 
 
         if pause:
