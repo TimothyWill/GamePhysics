@@ -36,12 +36,7 @@ class Slider:
             # Base Case
             else:
                 self.dialPositionX = pygame.mouse.get_pos()[0]
-        # Print the slider's value
-        # Get the slider's position as a value between 0 and 1
-        relativePosition = (self.dialPositionX - self.position[0]) / self.size[0]
-        print("Relative Position: " + str(relativePosition))
-        value = relativePosition * (self.maxValue - self.minValue) + self.minValue
-        print("Value: " + str(value))
+
         
         
         
@@ -61,5 +56,13 @@ class Slider:
         if hypDistance <= self.dialRadius:
             return True
         return False
+    
+    def getValue(self):
+        # Get the slider's position as a value between 0 and 1
+        relativePosition = (self.dialPositionX - self.position[0]) / self.size[0]
+        print("Relative Position: " + str(relativePosition))
+        value = relativePosition * (self.maxValue - self.minValue) + self.minValue
+        print("Value: " + str(value))
+        return value
 
        
