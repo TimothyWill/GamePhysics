@@ -39,7 +39,7 @@ def gravity_force(obj1, obj2):
     r = obj1.pos - obj2.pos # distance between two objects
     m1 = obj1.mass # mass of 1st object
     m2 = obj2.mass # mass of 2nd object
-    G = 1 #6.67384*(10**(-11)) # gravitational constant
+    G = 6.67384*(10**(-11)) # gravitational constant
     if r.mag() > (obj1.radius + obj2.radius):
         force = -((G*m1*m2)/r.mag2())*r.hat() # this is the formula for gravity
     else:
@@ -56,7 +56,7 @@ def main():
     screen = pygame.display.set_mode([width,height])
     screen_center = Vec2d(width/2, height/2)
     coords = Coords(screen_center.copy(), 1, True)
-    zoom = 80
+    zoom = 0.01
     coords.zoom_at_coords(Vec2d(0,0), zoom) 
     
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
@@ -68,10 +68,10 @@ def main():
     # Create initial objects to demonstrate
     objects = []
     n = 20
-    mass = 1
-    radius = 0.2
+    mass = 6*(10**24)
+    radius = 4000
     for i in range(n):
-        radius = uniform(0.3, 0.8)
+        radius = uniform(3000, 6000)
         mass = radius*radius*20
         objects.append(Circle(Vec2d(width/zoom*uniform(-0.5,0.5), 
                                     height/zoom*uniform(-0.5,0.5)),
@@ -80,7 +80,7 @@ def main():
 
     # -------- Main Program Loop -----------\
     frame_rate = 60
-    playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
+    playback_speed = 60000 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate
     print("timestep =", dt)
     
