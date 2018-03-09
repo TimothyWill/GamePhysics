@@ -66,17 +66,18 @@ def gravity_force(obj1, obj2):
     obj1.force += force
     obj2.force -= force
 
-def addNewBall(width, height, objects, zoom, position, coords):
+def addNewBall(width, height, objects, zoom, position, coords, velocity):
     print("Adding a new Ball")
     radius = massSlider.getValue()
-    radius = uniform(0.3, 0.8)
     mass = radius*radius*20
-    objects.append(Circle(coords.pos_to_coords(position), 2*Vec2d(uniform(-1,1), uniform(-1,1)),
+    objects.append(Circle(coords.pos_to_coords(position), velocity,
                               mass, radius, random_bright_color()))
     print("Position: " + str(objects[len(objects) - 1].pos))
     return
 
 def main():
+    mouseDownCoords = Vec2d(-1, -1)
+    
     pygame.init()
  
     width = 800
@@ -118,6 +119,15 @@ def main():
     while not done:
         # --- Main event loop
         
+        # Add a new ball
+        if pygame.mouse.get_pressed()[0]:
+            print("Button Pressed")
+            mouseDownCoords = Vec2d(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+        elif mouseDownCoords.x != -1:
+            print("Button Released")
+            addNewBall(width, height, objects, zoom, pygame.mouse.get_pos(), coords, Vec2d(0, 0))
+            mouseDownCoords = Vec2d(-1, -1)
+        
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: # If user clicked close
                 done = True
@@ -127,9 +137,7 @@ def main():
                     pause = not pause
                 if keys[pygame.K_0]:
                     center(objects)
-            # Add a new ball
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                addNewBall(width, height, objects, zoom, pygame.mouse.get_pos(), coords)
+
 
 
         if pause:
@@ -142,7 +150,7 @@ def main():
                 
             screen.fill(GRAY, pygame.Rect(300, 200, 200, 50), pygame.BLEND_ADD)
             screen.blit(pauseText, (350, 200))
-        else:            
+        else:
             # Physics
             # Calculate the force on each object
             for obj in objects:
