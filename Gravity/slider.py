@@ -53,6 +53,7 @@ class Slider:
 
         hypDistance = math.hypot(xDistance, yDistance)
         
+        # Check whether the mouse is in range of the dial
         if hypDistance <= self.dialRadius:
             return True
         return False
