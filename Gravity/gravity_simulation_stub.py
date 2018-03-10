@@ -20,6 +20,8 @@ GRAY     = ( 127, 127, 127)
 
 # The slider to enter the mass of new objects
 massSlider = Slider(0.3, 0.8, 30, (30, 80), (300, 5))
+centerMass = 0
+centerVelocity = 0
 
 
 def center(objects):
@@ -103,7 +105,7 @@ def main():
 
     # Create initial objects to demonstrate
     objects = []
-    n = 20
+    n = 10
     mass = 1
     radius = 0.2
     for i in range(n):
@@ -122,15 +124,17 @@ def main():
     print("timestep =", dt)
     
     pause = False
+    addPause = False
     done = False
     while not done:
         # --- Main event loop
         
         # Add new Circles
         # check if the user is pressing the mouse button
-        if pygame.mouse.get_pressed()[0] and mouseDownPosition.x == -1:
+        if pygame.mouse.get_pressed()[0] and mouseDownPosition.x == -1 and not massSlider.sliding:
             # Set mouseDownPosition to the currernt position
             mouseDownPosition = Vec2d(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+            addPause = True
         # When the user releases the mouse button
         elif pygame.mouse.get_pressed()[0] == False and mouseDownPosition.x != -1:
             # Calculate the velocity based on the distance between the two mouse positions
@@ -139,6 +143,7 @@ def main():
             # Create the new ball
             addNewBall(width, height, objects, zoom, mouseDownPosition, coords, Vec2d(newVelocityX, newVelocityY))
             mouseDownPosition = Vec2d(-1, -1)
+            addPause = False
         
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: # If user clicked close
@@ -151,14 +156,17 @@ def main():
                     center(objects)
 
 
-        if pause:
+        if pause or addPause:
             # Update Slider
             massSlider.update()
             # Drawing
             screen.fill(WHITE) # wipe the screen
             for obj in objects:
                 obj.draw(screen, coords) # draw object to screen
-                
+            
+            if addPause:
+                pygame.draw.line(screen, BLACK, mouseDownPosition, pygame.mouse.get_pos(), 1)
+                pygame.draw.circle(screen, BLACK, mouseDownPosition, int(coords.scalar_to_screen(massSlider.getValue())))
             screen.fill(GRAY, pygame.Rect(300, 200, 200, 50), pygame.BLEND_ADD)
             screen.blit(pauseText, (350, 200))
         else:            
@@ -185,6 +193,9 @@ def main():
         # Draw the Sliders
         massSlider.draw(screen)
 
+        if not addPause:
+            # Draw transparent circle
+            pygame.draw.circle(screen, BLACK, pygame.mouse.get_pos(), int(coords.scalar_to_screen(massSlider.getValue())), pygame.BLEND_ADD)
         # --- Update the screen with what we've drawn.
         pygame.display.update()
     
