@@ -31,6 +31,21 @@ def random_bright_color():
     color[(i+d)%3] = c
     return color
 
+# apply gravity between the two objects
+def gravity_force(obj1, obj2):
+    """ compute the force on each object
+        add to each, equal and opposite """
+    r = obj1.pos - obj2.pos # distance between two objects
+    m1 = obj1.mass # mass of 1st object
+    m2 = obj2.mass # mass of 2nd object
+    G = 1 #6.67384*(10**(-11)) # gravitational constant
+    if r.mag() > (obj1.radius + obj2.radius):
+        force = -((G*m1*m2)/r.mag2())*r.hat() # this is the formula for gravity
+    else:
+        force = 1*(r.mag()-obj1.radius)*r.hat() # this is the formula for repulsion
+    
+    obj1.force += force
+    obj2.force -= force
 
 def main():
     pygame.init()
@@ -51,7 +66,10 @@ def main():
     radius = 1
     mass = radius*radius*20
     objects.append(Circle(Vec2d(-1, 0), Vec2d(0,0), mass, radius, random_bright_color()))
-    objects.append(Circle(Vec2d(4, -2), Vec2d(-5,2), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(6, 1), Vec2d(-10, 0), mass, radius, random_bright_color()))
 
 
     # -------- Main Program Loop -----------\
@@ -71,17 +89,26 @@ def main():
         # Move each object according to physics
         for obj in objects:
             obj.update(dt)
-        m1 = objects[0].mass
-        m2 = objects[1].mass
-        r = objects[0].pos - objects[1].pos 
-        u = 1/((1/m1) + (1/m2))
-        v1 = objects[0].vel
-        v2 = objects[1].vel
-        
-        if r.mag() < (objects[0].radius + objects[1].radius):
-            J = 1.5*u*(v2 - v1)
-            objects[0].mom += J
-            objects[1].mom -= J
+            
+            
+        for i1, obj1 in enumerate(objects):
+                for i2, obj2 in enumerate(objects):
+                    if i1 < i2:
+                        # Apply gravity force
+                        gravity_force(obj1, obj2)
+                        
+                        m1 = obj1.mass
+                        m2 = obj2.mass
+                        r = obj1.pos - obj2.pos
+                        u = 1/((1/m1) + (1/m2))
+                        v1 = obj1.vel
+                        v2 = obj2.vel
+                        nHat = r.hat()
+                        
+                        if r.mag() < (objects[0].radius + objects[1].radius) and (v2 - v1).dot(nHat) > 0:
+                            J = 1.6*u*((v2 - v1).dot(nHat)) * nHat
+                            obj1.mom += J
+                            obj2.mom -= J
         
 
         # Drawing
