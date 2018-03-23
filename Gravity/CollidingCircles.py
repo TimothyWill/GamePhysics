@@ -50,15 +50,17 @@ def collides(obj1, obj2):
         
         m1 = obj1.mass
         m2 = obj2.mass
-        r = obj1.pos - obj2.pos
+        r = obj2.pos - obj1.pos
         u = 1/((1/m1) + (1/m2))
         v1 = obj1.vel
         v2 = obj2.vel
         n = (obj2.pos - obj1.pos).normalized()
         J = 1.6*u*((v2 - v1).dot(n))
         d = obj1.radius + obj2.radius - (obj1.pos - obj2.pos).mag()
-        #L = u*r.cross(v1 - v2)
-        #J2 = -d*(L)/r*(r+d)
+        L = u*r.cross(v2 - v1)
+        J2 = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
+        obj1.mom -= J2
+        obj2.mom += J2
         obj1.pos = obj1.pos - (u/m1)*d*n
         obj2.pos = obj2.pos + (u/m2)*d*n
         if (J < 0):
@@ -83,11 +85,11 @@ def main():
     mass = 1
     radius = 1
     mass = radius*radius*20
-    objects.append(Circle(Vec2d(-1, 0), Vec2d(0,0), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(-2, 0), Vec2d(1,0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass, radius, random_bright_color()))
-    objects.append(Circle(Vec2d(6, 1), Vec2d(-1, 0), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(2, 1), Vec2d(-0.5, 0), 2*mass, radius, random_bright_color()))
 
 
     # -------- Main Program Loop -----------\
@@ -126,6 +128,11 @@ def main():
         for obj in objects:
             obj.draw(screen, coords) # draw object to screen
             
+        L = 0
+        for obj in objects:
+            L += obj.pos.cross(obj.mom)
+        print(L)
+        
         # --- Update the screen with what we've drawn.
         pygame.display.update()
     
