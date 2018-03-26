@@ -47,7 +47,6 @@ def gravity_force(obj1, obj2):
 
 def collides(obj1, obj2):
     if (obj1.pos.get_distance(obj2.pos) < obj1.radius + obj2.radius):
-        
         m1 = obj1.mass
         m2 = obj2.mass
         r = obj2.pos - obj1.pos
@@ -58,14 +57,32 @@ def collides(obj1, obj2):
         J = 1.6*u*((v2 - v1).dot(n))
         d = obj1.radius + obj2.radius - (obj1.pos - obj2.pos).mag()
         L = u*r.cross(v2 - v1)
-        J2 = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
-        obj1.mom -= J2
-        obj2.mom += J2
+        Jang = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
+        obj1.mom -= Jang
+        obj2.mom += Jang
         obj1.pos = obj1.pos - (u/m1)*d*n
         obj2.pos = obj2.pos + (u/m2)*d*n
         if (J < 0):
             obj1.mom += J * n
             obj2.mom -= J * n
+            
+def collideWithWalls(obj, wall):
+    R = obj.radius
+    n = wall.normal
+    if (n.dot(obj.pos - wall.pos) < R):
+        m = obj.mass
+        r = wall.pos - obj.pos
+        u = m
+        v1 = obj.vel
+        v2 = wall.vel
+        J = 1.6*u*((v2 - v1).dot(n))
+        d = obj.radius - (r).dot(n.hat())
+        L = u*r.cross(v2 - v1)
+        Jang = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
+        obj.mom -= Jang
+        obj.pos = obj.pos - (u/m)*d*n
+        if (J < 0):
+            obj.mom += J * n
 
 def main():
     pygame.init()
@@ -89,7 +106,7 @@ def main():
     #objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass, radius, random_bright_color()))
-    objects.append(Circle(Vec2d(2, 1), Vec2d(-0.5, 0), 2*mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(2, 0), Vec2d(-1, 0), mass, radius, random_bright_color()))
 
 
     # -------- Main Program Loop -----------\
@@ -104,14 +121,10 @@ def main():
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: # If user clicked close
                 done = True
-                
+               
         for obj in objects:
             obj.force.zero()
-        for i1, obj1 in enumerate(objects):
-                for i2, obj2 in enumerate(objects):
-                    if i1 < i2:
-                        gravity_force(obj1, obj2)
-                        
+            obj.force -= Vec2d(0,9.8)                        
             
         # Move each object according to physics
         for obj in objects:
