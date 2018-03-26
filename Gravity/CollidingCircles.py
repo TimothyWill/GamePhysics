@@ -47,7 +47,7 @@ def gravity_force(obj1, obj2):
 
 def collides(obj1, obj2):
     if (obj1.pos.get_distance(obj2.pos) < obj1.radius + obj2.radius):
-        
+        e = 0.5
         m1 = obj1.mass
         m2 = obj2.mass
         r = obj2.pos - obj1.pos
@@ -55,12 +55,12 @@ def collides(obj1, obj2):
         v1 = obj1.vel
         v2 = obj2.vel
         n = (obj2.pos - obj1.pos).normalized()
-        J = 1.6*u*((v2 - v1).dot(n))
+        J = (1 + e)*u*((v2 - v1).dot(n))
         d = obj1.radius + obj2.radius - (obj1.pos - obj2.pos).mag()
         L = u*r.cross(v2 - v1)
-        J2 = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
-        obj1.mom -= J2
-        obj2.mom += J2
+        Jang = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
+        obj1.mom -= Jang
+        obj2.mom += Jang
         obj1.pos = obj1.pos - (u/m1)*d*n
         obj2.pos = obj2.pos + (u/m2)*d*n
         if (J < 0):
@@ -85,11 +85,12 @@ def main():
     mass = 1
     radius = 1
     mass = radius*radius*20
-    objects.append(Circle(Vec2d(-2, 0), Vec2d(1,0), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(-2, 0), Vec2d(5,-0.5), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass, radius, random_bright_color()))
-    objects.append(Circle(Vec2d(2, 1), Vec2d(-0.5, 0), 2*mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(2, 1), Vec2d(-4, 0), 2*mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(7, 1), Vec2d(0, 0.5), 2*mass, radius, random_bright_color()))
 
 
     # -------- Main Program Loop -----------\
@@ -127,6 +128,8 @@ def main():
         screen.fill(WHITE) # wipe the screen
         for obj in objects:
             obj.draw(screen, coords) # draw object to screen
+            
+        pygame.draw.lines(screen, BLACK, False, [coords.pos_to_screen(Vec2d(1,1)), coords.pos_to_screen(Vec2d(1,2))], 1)
             
         L = 0
         for obj in objects:
