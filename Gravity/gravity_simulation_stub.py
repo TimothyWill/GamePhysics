@@ -105,9 +105,9 @@ def main():
 
     # Create initial objects to demonstrate
     objects = []
-    n = 10
+    n = 0
     mass = 1
-    radius = 0.2
+    radius = 1
     for i in range(n):
         radius = uniform(0.3, 0.8)
         mass = radius*radius*20
