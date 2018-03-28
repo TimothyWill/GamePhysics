@@ -13,13 +13,8 @@ class Wall:
         self.pos2 = pos2
         self.vel = vel
         self.color = color
-        self.mom = self.vel*self.mass
         self.force = Vec2d(0,0)  
         self.normal = self.makeNormal(self.pos1, self.pos2)
-    def update_vel(self):
-        self.vel.copy_in(self.mom/self.mass)
-    def update_pos(self, dt):
-        self.pos += self.vel*dt
 
     def update(self, dt):
         self.mom += self.force*dt
@@ -27,9 +22,10 @@ class Wall:
         self.pos += self.vel*dt
                 
     def draw(self, screen, coords):
-        pygame.draw.circle(screen, self.color, 
-                           coords.pos_to_screen(self.pos).int(), 
-                           int(coords.scalar_to_screen(2)), 0)
+        screenPos1 = coords.pos_to_screen(self.pos1)
+        screenPos2 = coords.pos_to_screen(self.pos2)
+        pygame.draw.polygon(screen, self.color, [[screenPos1.x, screenPos1.y], [screenPos2.x, screenPos2.y]], 5)
+        
    
     def makeNormal(self, pos1, pos2):
         return Vec2d(pos1.x-pos2.x, pos1.y-pos2.y).perpendicular().normalized()
