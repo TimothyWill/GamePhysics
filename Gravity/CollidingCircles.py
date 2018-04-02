@@ -67,6 +67,8 @@ def collides(obj1, obj2):
         if (J < 0):
             obj1.mom += J * n
             obj2.mom -= J * n
+            obj1.update_vel()
+            obj2.update_vel()
             
 def collideWithWalls(obj, wall):
     R = obj.radius
@@ -161,14 +163,29 @@ def main():
         for obj in objects:
             obj.update(dt)
             
-        for i1, obj1 in enumerate(objects):
+        maxCollisions = 50
+        
+        for i in range(maxCollisions):
+            collided = False
+            for i1, obj1 in enumerate(objects):
                 for i2, obj2 in enumerate(objects):
                     if i1 < i2:
                         collides(obj1, obj2)
+                        collided = True
+                if not collided:
+                    break
+                
+        #for i in range(maxCollisions):
+         #   collided = False
+          #  for i1 in range(len(objects)):
+           #     for i2 in range(i1):
+            #        collides(objects[i1], objects[i2])
+             #   if not collided:
+              #      break
         
         for i1, obj1 in enumerate(objects):
-                for i2, wall1 in enumerate(walls):
-                    collideWithWalls(obj1,wall1)
+            for i2, wall1 in enumerate(walls):
+                collideWithWalls(obj1,wall1)
 
         # Drawing
         screen.fill(WHITE) # wipe the screen
