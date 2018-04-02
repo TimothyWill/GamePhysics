@@ -9,6 +9,7 @@ from vec2d import Vec2d
 from coords import Coords
 from circle import Circle
 from random import uniform, randint, random
+from wall import Wall
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -70,20 +71,20 @@ def collides(obj1, obj2):
 def collideWithWalls(obj, wall):
     R = obj.radius
     n = wall.normal
-    if (n.dot(obj.pos - wall.pos) < R):
+    d = R - (n.dot(obj.pos - wall.pos1))
+    if (d > 0):
         m = obj.mass
-        r = wall.pos - obj.pos
+        #r = obj.pos - wall.pos1
         u = m
         v1 = obj.vel
-        v2 = wall.vel
-        J = 1.6*u*((v2 - v1).dot(n))
-        d = obj.radius - (r).dot(n.hat())
-        L = u*r.cross(v2 - v1)
-        Jang = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
-        obj.mom -= Jang
+        J = 1.6*u*((v1).dot(n))
+        #d = obj.radius - (r).dot(n.hat())
+        #L = u*r.cross(v1)
+        #Jang = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
+        #obj.mom -= Jang
         obj.pos = obj.pos - (u/m)*d*n
         if (J < 0):
-            obj.mom += J * n
+            obj.mom -= J * n
 
 def main():
     pygame.init()
@@ -93,21 +94,25 @@ def main():
     screen = pygame.display.set_mode([width,height])
     screen_center = Vec2d(width/2, height/2)
     coords = Coords(screen_center.copy(), 1, True)
-    zoom = 80
+    zoom = 30
     coords.zoom_at_coords(Vec2d(0,0), zoom) 
     
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
     
     objects = []
+    walls = []
     mass = 1
     radius = 1
     mass = radius*radius*20
-    objects.append(Circle(Vec2d(-2, 0), Vec2d(5,-0.5), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(-5, 5), Vec2d(0,0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass, radius, random_bright_color()))
-    objects.append(Circle(Vec2d(2, 0), Vec2d(-1, 0), mass, radius, random_bright_color()))
+    #objects.append(Circle(Vec2d(2, 0), Vec2d(-1, 0), mass, radius, random_bright_color()))
+    
+    walls.append(Wall(Vec2d(10,0), Vec2d(0,-10), 0, BLACK))
+    walls.append(Wall(Vec2d(0,-10), Vec2d(-10,-2), 0, BLACK))
 
 
     # -------- Main Program Loop -----------\
@@ -136,13 +141,19 @@ def main():
                     if i1 < i2:
                         collides(obj1, obj2)
         
+        for i1, obj1 in enumerate(objects):
+                for i2, wall1 in enumerate(walls):
+                    collideWithWalls(obj1,wall1)
 
         # Drawing
         screen.fill(WHITE) # wipe the screen
         for obj in objects:
             obj.draw(screen, coords) # draw object to screen
+        
+        for wall in walls:
+            wall.draw(screen, coords)
             
-        pygame.draw.lines(screen, BLACK, False, [coords.pos_to_screen(Vec2d(1,1)), coords.pos_to_screen(Vec2d(1,2))], 1)
+        #pygame.draw.lines(screen, BLACK, False, [coords.pos_to_screen(Vec2d(1,1)), coords.pos_to_screen(Vec2d(1,2))], 1)
             
         L = 0
         for obj in objects:

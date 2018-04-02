@@ -13,23 +13,30 @@ class Wall:
         self.pos2 = pos2
         self.vel = vel
         self.color = color
-        self.mom = self.vel*self.mass
-        self.force = Vec2d(0,0)  
         self.normal = self.makeNormal(self.pos1, self.pos2)
-    def update_vel(self):
-        self.vel.copy_in(self.mom/self.mass)
-    def update_pos(self, dt):
-        self.pos += self.vel*dt
 
-    def update(self, dt):
-        self.mom += self.force*dt
-        self.vel.copy_in(self.mom/self.mass)
-        self.pos += self.vel*dt
-                
     def draw(self, screen, coords):
-        pygame.draw.circle(screen, self.color, 
-                           coords.pos_to_screen(self.pos).int(), 
-                           int(coords.scalar_to_screen(2)), 0)
+        pos1 = coords.pos_to_screen(self.pos1)
+        normal = coords.unitvec_to_other(self.normal)
+        X = screen.get_width()-1
+        Y = screen.get_height()-1
+        perp = normal.perpendicular()
+        if perp.x == 0:
+            start = Vec2d(pos1.x, 0)
+            end   = Vec2d(pos1.x, Y)
+        elif perp.y == 0:
+            start = Vec2d(0, pos1.y)
+            end   = Vec2d(X, pos1.y)
+        else:
+            s = []
+            s.append((0-pos1.x)/perp.x)                
+            s.append((0-pos1.y)/perp.y)                
+            s.append((X-pos1.x)/perp.x)                
+            s.append((Y-pos1.y)/perp.y)
+            s.sort()
+            start = pos1 + perp*s[1]
+            end   = pos1 + perp*s[2]
+        pygame.draw.line(screen, self.color, start, end, 1)
    
     def makeNormal(self, pos1, pos2):
         return Vec2d(pos1.x-pos2.x, pos1.y-pos2.y).perpendicular().normalized()
