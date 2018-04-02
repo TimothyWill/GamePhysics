@@ -82,11 +82,24 @@ def collideWithWalls(obj, wall):
         #L = u*r.cross(v1)
         #Jang = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
         #obj.mom -= Jang
-        obj.pos = obj.pos - (u/m)*d*n
+        obj.pos = obj.pos + (u/m)*d*n
         if (J < 0):
             obj.mom -= J * n
+            
+# Add a new circle to the scene
+def addNewBall(width, height, objects, zoom, position, coords, velocity):
+    # Get the radius of the ball from the slider
+    radius = randint(1,5)
+    # Calculate the mass based on the radius
+    mass = radius
+    # Add the circle to the array
+    objects.append(Circle(coords.pos_to_coords(position), velocity,
+                              mass, radius, random_bright_color()))
 
 def main():
+    # Variable where the position where the new ball will be placed is stored
+    mouseDownPosition = Vec2d(-1, -1);
+    
     pygame.init()
  
     width = 800
@@ -105,11 +118,11 @@ def main():
     mass = 1
     radius = 1
     mass = radius*radius*20
-    objects.append(Circle(Vec2d(-5, 5), Vec2d(0,0), mass, radius, random_bright_color()))
-    #objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
-    #objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass, radius, random_bright_color()))
-    #objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass, radius, random_bright_color()))
-    #objects.append(Circle(Vec2d(2, 0), Vec2d(-1, 0), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(-5, 5), Vec2d(0,0), 2*mass, 2*radius, random_bright_color()))
+    objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
+    objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass/3, radius/3, random_bright_color()))
+    objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass/2, radius/2, random_bright_color()))
+    objects.append(Circle(Vec2d(2, 0), Vec2d(-1, 0), 4*mass, 4*radius, random_bright_color()))
     
     walls.append(Wall(Vec2d(10,0), Vec2d(0,-10), 0, BLACK))
     walls.append(Wall(Vec2d(0,-10), Vec2d(-10,-2), 0, BLACK))
@@ -124,13 +137,25 @@ def main():
     done = False
     while not done:
         # --- Main event loop
+        if pygame.mouse.get_pressed()[0] and mouseDownPosition.x == -1:
+            # Set mouseDownPosition to the currernt position
+            mouseDownPosition = Vec2d(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+        # When the user releases the mouse button
+        elif pygame.mouse.get_pressed()[0] == False and mouseDownPosition.x != -1:
+            # Calculate the velocity based on the distance between the two mouse positions
+            newVelocityX = (mouseDownPosition.x - pygame.mouse.get_pos()[0]) * -0.05
+            newVelocityY = (mouseDownPosition.y - pygame.mouse.get_pos()[1]) * 0.05
+            # Create the new ball
+            addNewBall(width, height, objects, zoom, mouseDownPosition, coords, Vec2d(newVelocityX, newVelocityY))
+            mouseDownPosition = Vec2d(-1, -1)
+            
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: # If user clicked close
                 done = True
                
         for obj in objects:
             obj.force.zero()
-            obj.force -= Vec2d(0,9.8)                        
+            obj.force -= Vec2d(0,60)                        
             
         # Move each object according to physics
         for obj in objects:
