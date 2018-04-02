@@ -15,6 +15,11 @@ class Wall:
         self.color = color
         self.normal = self.makeNormal(self.pos1, self.pos2)
 
+    def update(self, dt):
+        self.mom += self.force*dt
+        self.vel.copy_in(self.mom/self.mass)
+        self.pos += self.vel*dt
+                
     def draw(self, screen, coords):
         pos1 = coords.pos_to_screen(self.pos1)
         normal = coords.unitvec_to_other(self.normal)
@@ -38,6 +43,7 @@ class Wall:
             end   = pos1 + perp*s[2]
         pygame.draw.line(screen, self.color, start, end, 1)
    
+
     def makeNormal(self, pos1, pos2):
         return Vec2d(pos1.x-pos2.x, pos1.y-pos2.y).perpendicular().normalized()
  
