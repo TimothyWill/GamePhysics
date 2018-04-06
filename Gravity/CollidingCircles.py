@@ -74,6 +74,7 @@ def collideWithWalls(obj, wall):
     R = obj.radius
     n = wall.normal
     d = R - (n.dot(obj.pos - wall.pos1))
+    tangent = n.perpendicular_normal()
     if (d > 0):
         m = obj.mass
         #r = obj.pos - wall.pos1
@@ -88,10 +89,24 @@ def collideWithWalls(obj, wall):
         if (J < 0):
             obj.mom -= J * n
             
+        Fric = -obj.mass * obj.vel.dot(tangent)
+        cf = 0.75 # Coefficient of Friction
+        
+        if (abs(Fric) > cf * J):
+            ratio = cf * J/abs(Fric)
+            Fric *= ratio
+        else:
+            ratio = 1
+        
+        ratio *= obj.vel.dot(tangent)/obj.vel.dot(n)
+       # obj.pos -= (obj.radius - d) * ratio * tangent
+        
+        obj.mom -= Fric * tangent
+            
 # Add a new circle to the scene
 def addNewBall(width, height, objects, zoom, position, coords, velocity):
     # Get the radius of the ball from the slider
-    radius = randint(1,5)
+    radius = randint(1,3)
     # Calculate the mass based on the radius
     mass = radius
     # Add the circle to the array
@@ -120,11 +135,11 @@ def main():
     mass = 1
     radius = 1
     mass = radius*radius*20
-    objects.append(Circle(Vec2d(-5, 5), Vec2d(0,0), 2*mass, 2*radius, random_bright_color()))
-    objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
-    objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass/3, radius/3, random_bright_color()))
-    objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass/2, radius/2, random_bright_color()))
-    objects.append(Circle(Vec2d(2, 0), Vec2d(-1, 0), 4*mass, 4*radius, random_bright_color()))
+    #objects.append(Circle(Vec2d(-5, 5), Vec2d(0,0), 2*mass, 2*radius, random_bright_color()))
+    #objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
+    #objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass/3, radius/3, random_bright_color()))
+    #objects.append(Circle(Vec2d(0, -2), Vec2d(0, 0), mass/2, radius/2, random_bright_color()))
+    #objects.append(Circle(Vec2d(2, 0), Vec2d(-1, 0), 4*mass, 4*radius, random_bright_color()))
     
     walls.append(Wall(Vec2d(10,0), Vec2d(0,-10), 0, BLACK))
     walls.append(Wall(Vec2d(0,-10), Vec2d(-10,-2), 0, BLACK))
