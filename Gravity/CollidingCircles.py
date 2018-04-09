@@ -7,8 +7,9 @@ Created on Fri Oct 27 13:56:44 2017
 import pygame
 from vec2d import Vec2d
 from coords import Coords
-from circle import Circle
-from random import uniform, randint, random
+#from circle import Circle
+from rotating_circle import RotatingCircle
+from random import randint, random
 from wall import Wall
 
 # Define some colors
@@ -106,12 +107,12 @@ def collideWithWalls(obj, wall):
 # Add a new circle to the scene
 def addNewBall(width, height, objects, zoom, position, coords, velocity):
     # Get the radius of the ball from the slider
-    radius = randint(1,3)
+    radius = randint(5,20)*.1
     # Calculate the mass based on the radius
     mass = radius
     # Add the circle to the array
-    objects.append(Circle(coords.pos_to_coords(position), velocity,
-                              mass, radius, random_bright_color()))
+    objects.append(RotatingCircle(coords.pos_to_coords(position), velocity,
+                              mass, radius, random_bright_color(),BLACK, random()*2*3.14))
 
 def main():
     # Variable where the position where the new ball will be placed is stored
@@ -132,9 +133,9 @@ def main():
     
     objects = []
     walls = []
-    mass = 1
-    radius = 1
-    mass = radius*radius*20
+    #mass = 1
+    #radius = 1
+    #mass = radius*radius*20
     #objects.append(Circle(Vec2d(-5, 5), Vec2d(0,0), 2*mass, 2*radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 0), Vec2d(0, 0), mass, radius, random_bright_color()))
     #objects.append(Circle(Vec2d(2, 4), Vec2d(0, 0), mass/3, radius/3, random_bright_color()))

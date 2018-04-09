@@ -11,10 +11,12 @@ Created on Fri Oct 27 13:56:44 2017
 @author: sinkovitsd
 """
 import pygame
+import math
 from vec2d import Vec2d
+from circle import Circle
 
 class RotatingCircle(Circle):
-    def __init__(self, pos, vel, mass, radius, color, angle=0, angvel=0, linecolor):
+    def __init__(self, pos, vel, mass, radius, color, linecolor, angle=0, angvel=0):
         super().__init__(pos, vel, mass, radius, color)
         self.angle = angle
         self.angvel = angvel
@@ -56,9 +58,9 @@ class RotatingCircle(Circle):
                 
     def draw(self, screen, coords):
         #print("radius", self.radius, coords.scalar_to_screen(self.radius))
-        super.draw(screen, coords)
-        vec = self.radius*Vec2d(cos(self.angle), sin(self.angle))
-        pygame.draw.circle(screen, self.linecolor, 
+        super().draw(screen, coords)
+        vec = self.radius*Vec2d(math.cos(self.angle), math.sin(self.angle))
+        pygame.draw.line(screen, self.linecolor, 
                            coords.pos_to_screen(self.pos).int(), 
                            coords.pos_to_screen(self.pos + vec).int())
  
