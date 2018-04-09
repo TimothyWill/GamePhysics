@@ -76,6 +76,8 @@ def collideWithWalls(obj, wall):
     n = wall.normal
     d = R - (n.dot(obj.pos - wall.pos1))
     tangent = n.perpendicular_normal()
+    vT = (obj.vel.dot(tangent)-obj.radius*obj.angvel)
+    mT = 1/((1/obj.mass)+((R*R)/obj.moment))
     if (d > 0):
         m = obj.mass
         #r = obj.pos - wall.pos1
@@ -90,7 +92,8 @@ def collideWithWalls(obj, wall):
         if (J < 0):
             obj.mom -= J * n
             
-        Fric = -obj.mass * obj.vel.dot(tangent)
+        #Fric = -obj.mass * obj.vel.dot(tangent)
+        Fric = -mT*vT
         cf = 0.75 # Coefficient of Friction
         
         if (abs(Fric) > cf * J):
@@ -103,6 +106,8 @@ def collideWithWalls(obj, wall):
        # obj.pos -= (obj.radius - d) * ratio * tangent
         
         obj.mom -= Fric * tangent
+        
+        #obj.impulse(J, None)
             
 # Add a new circle to the scene
 def addNewBall(width, height, objects, zoom, position, coords, velocity):
