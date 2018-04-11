@@ -84,30 +84,34 @@ def collideWithWalls(obj, wall):
         u = m
         v1 = obj.vel
         J = 1.6*u*((v1).dot(n))
+        
         #d = obj.radius - (r).dot(n.hat())
         #L = u*r.cross(v1)
         #Jang = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
         #obj.mom -= Jang
         obj.pos = obj.pos + (u/m)*d*n
         if (J < 0):
-            obj.mom -= J * n
+            #obj.mom -= J * n
+            #obj.impulse(J, None)
             
-        #Fric = -obj.mass * obj.vel.dot(tangent)
-        Fric = -mT*vT
-        cf = 0.75 # Coefficient of Friction
+            #Fric = -obj.mass * obj.vel.dot(tangent)
+            Fric = -mT*vT
+            cf = 0.75 # Coefficient of Friction
+            
+            if (abs(Fric) > cf * abs(J)):
+                ratio = cf * abs(J)/abs(Fric)
+                Fric *= ratio
+            else:
+                ratio = 1
+            
+            #ratio *= obj.vel.dot(tangent)/obj.vel.dot(n)
+           # obj.pos -= (obj.radius - d) * ratio * tangent
+            r = obj.pos-obj.radius*n
+            #obj.mom -= Fric * tangent
+            imp = -J * n + Fric * tangent
+            obj.impulse(imp, r)
         
-        if (abs(Fric) > cf * J):
-            ratio = cf * J/abs(Fric)
-            Fric *= ratio
-        else:
-            ratio = 1
         
-        ratio *= obj.vel.dot(tangent)/obj.vel.dot(n)
-       # obj.pos -= (obj.radius - d) * ratio * tangent
-        
-        obj.mom -= Fric * tangent
-        
-        #obj.impulse(J, None)
             
 # Add a new circle to the scene
 def addNewBall(width, height, objects, zoom, position, coords, velocity):
@@ -115,9 +119,12 @@ def addNewBall(width, height, objects, zoom, position, coords, velocity):
     radius = randint(5,20)*.1
     # Calculate the mass based on the radius
     mass = radius
+    
+    angle = random()*2*3.14
+    print(angle)
     # Add the circle to the array
     objects.append(RotatingCircle(coords.pos_to_coords(position), velocity,
-                              mass, radius, random_bright_color(),BLACK, random()*2*3.14))
+                              mass, radius, random_bright_color(),BLACK, angle))
 
 def main():
     # Variable where the position where the new ball will be placed is stored
@@ -221,7 +228,7 @@ def main():
         L = 0
         for obj in objects:
             L += obj.pos.cross(obj.mom)
-        print(L)
+        #print(L)
         
         # --- Update the screen with what we've drawn.
         pygame.display.update()
