@@ -77,10 +77,10 @@ class Polygon:
         # Calculate rotated points and normals
         self.points = []
         for p in self.origpoints:
-            self.points.append(p)
+            self.points.append(Vec2d(0,0))
         self.normals = []
         for n in self.orignormals:
-            self.normals.append(n)
+            self.normals.append(Vec2d(0,0))
         self.update_points_normals()
                 
         self.mom = self.mass*self.vel
@@ -113,10 +113,12 @@ class Polygon:
         c = cos(self.angle)
         s = sin(self.angle)
         #> use s and c to calculate points and normals rotated
-        for p in self.origpoints:
-            p.rotate(self.angle)
-        for n in self.orignormals:
-            n.rotate(self.angle)
+        for i in range(len(self.points)):
+            self.points[i].x = self.origpoints[i].x * c - self.origpoints[i].y * s
+            self.points[i].y = self.origpoints[i].y * c + self.origpoints[i].x * s
+        for i in range(len(self.normals)):
+            self.normals[i].x = self.orignormals[i].x * c - self.orignormals[i].y * s
+            self.normals[i].y = self.orignormals[i].y * c + self.orignormals[i].x * s
             
 
     def update(self, dt):
