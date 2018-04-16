@@ -11,7 +11,7 @@ Created on Fri Oct 27 13:56:44 2017
 @author: sinkovitsd
 """
 import pygame
-import math
+from math import sin,cos
 from vec2d import Vec2d
 from circle import Circle
 
@@ -59,7 +59,7 @@ class RotatingCircle(Circle):
     def draw(self, screen, coords):
         #print("radius", self.radius, coords.scalar_to_screen(self.radius))
         super().draw(screen, coords)
-        vec = self.radius*Vec2d(math.cos(self.angle), math.sin(self.angle))
+        vec = self.radius*Vec2d(cos(self.angle), sin(self.angle))
         pygame.draw.line(screen, self.linecolor, 
                            coords.pos_to_screen(self.pos).int(), 
                            coords.pos_to_screen(self.pos + vec).int())
