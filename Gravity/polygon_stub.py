@@ -20,6 +20,7 @@ class Polygon:
         self.mass = 0
         self.force = Vec2d(0,0)
         self.torque = 0
+        self.type = "polygon"
 
         # Set origpoints
         self.origpoints = []
@@ -154,12 +155,41 @@ class Polygon:
                 Otherwise, find which wall is LEAST penetrated, and pass back,
                 via result.extend(), the overlap, point and normal involved; 
                 return True. """
+                
+            
+            # Create a list of Vec2d values for deepest values
+            deepest = []
+            # Loop through all the walls in other
             for i in range(len(other.normals)):
-                # Fill in
-                pass
+                # Give deepest a starting value
+                deepest.append(self.points[0])
+                
+                # loop through all the points in self
                 for j in range(len(self.points)):
-                    # Fill in
-                    pass
-            result.extend([self, other, overlap, normal, point])
+                    # check whether the new point is deeper than the current deppest point
+                    if ((other.normals[i] - self.points[j]).mag() >= (other.normals[i] - deepest[i]).mag()):
+                        # Change deepest if needed
+                        deepest[i] = self.points[j]
+                
+                
+            print("Deepest:")
+            print(deepest)
+            print("\n")
+            print("Points: ")
+            print(self.points)
+            print("\n")
+            
+            # Loop through all values of deepest and find the shortest one
+            shallowDeepest = 0
+            for i in range(len(deepest)):
+                if ((other.normals[i] - deepest[i]).mag() <= (other.normals[shallowDeepest] - deepest[shallowDeepest]).mag()):
+                    shallowDeepest = i
+                
+                
+            # Calculate the overlap to return
+            overlap = (other.normals[shallowDeepest] - deepest[shallowDeepest]).mag()
+            
+            # Extend the result to the result variable
+            result.extend([self, other, overlap, other.normals[shallowDeepest], deepest[shallowDeepest] + self.pos])
             return True
     
