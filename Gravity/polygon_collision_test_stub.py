@@ -7,7 +7,7 @@ Created on Fri Oct 27 13:56:44 2017
 import pygame
 from vec2d import Vec2d
 from coords import Coords
-from polygon import Polygon
+from polygon_stub import Polygon
 from math import sqrt, acos, degrees, sin, cos
 from random import uniform, randint, random
 
@@ -77,8 +77,17 @@ def check_collision(a, b, result=[]):
                 result.extend(result1)
                 return True
                 """
+        
+        print("Printing result1 and result2")
+        print(result1)
+        print(result2)
+        
+        if result1[2] < result2[2]:
+            result.extend(result1)
+        else:
+            result.extend(result2)
         pass
-    return False       
+    return False
 
 def main():
     pygame.init()
