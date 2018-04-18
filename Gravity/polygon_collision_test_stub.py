@@ -86,7 +86,8 @@ def check_collision(a, b, result=[]):
             result.extend(result1)
         else:
             result.extend(result2)
-        pass
+            
+        return True
     return False
 
 def main():
