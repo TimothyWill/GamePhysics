@@ -157,41 +157,43 @@ class Polygon:
                 Otherwise, find which wall is LEAST penetrated, and pass back,
                 via result.extend(), the overlap, point and normal involved; 
                 return True. """
-                
+            
             
             # Create a list of Vec2d values for deepest values
-            deepest = []
+            maxJ = []
+            maxD = 0;
+            overlap = 0
+            normal = 0
             # Loop through all the walls in other
             for i in range(len(other.normals)):
                 # Give deepest a starting value
-                deepest.append(self.points[0])
-                
+                maxJ.append(self.points[0] + self.pos)
+                maxD = -99999
+                # Calculate rOther
+                rOther = other.pos + other.points[i]
                 # loop through all the points in self
                 for j in range(len(self.points)):
+                    rSelf = self.pos + self.points[j]
+                    d = (rOther - rSelf).dot(other.normals[i])
+                    print("d: " + str(d))
                     # check whether the new point is deeper than the current deppest point
-                    if ((other.normals[i] - self.points[j]).mag() >= (other.normals[i] - deepest[i]).mag()):
+                    if (d > maxD):
                         # Change deepest if needed
-                        deepest[i] = self.points[j]
-                
-                
-            print("Deepest:")
-            print(deepest)
-            print("\n")
-            print("Points: ")
-            print(self.points)
-            print("\n")
-            
-            # Loop through all values of deepest and find the shortest one
-            shallowDeepest = 0
-            for i in range(len(deepest)):
-                if ((other.normals[i] - deepest[i]).mag() <= (other.normals[shallowDeepest] - deepest[shallowDeepest]).mag()):
-                    shallowDeepest = i
-                
-                
-            # Calculate the overlap to return
-            overlap = (other.normals[shallowDeepest] - deepest[shallowDeepest]).mag()
+                        maxD = d
+                        maxJ[i]= j
+                if (maxD < overlap):
+                        
+                    overlap = maxD
+                    normal = other.normals[i]
+                        
+            print ("MaxD: ")
+            print(maxD)
             
             # Extend the result to the result variable
-            result.extend([self, other, overlap, other.normals[shallowDeepest], deepest[shallowDeepest] + self.pos])
+                
+            if overlap < 0:
+                return False
+            
+            result.extend([self, other, overlap, normal, self.points[maxJ[0]] + self.pos])
             return True
     
