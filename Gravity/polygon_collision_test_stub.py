@@ -78,15 +78,14 @@ def check_collision(a, b, result=[]):
                 return True
                 """
         
-        print("Printing result1 and result2")
-        print(result1)
-        print(result2)
+        #print("Printing result1 and result2")
+        #print(result1)
+        #print(result2)
         
         if result1[2] < result2[2]:
             result.extend(result1)
         else:
-            result.extend(result2)
-            
+            result.extend(result2)  
         return True
     return False
 
@@ -172,6 +171,7 @@ def main():
                                  coords.pos_to_screen(point + overlap*normal).int())
                 # Separate objects accoring to position
                 """ Move obj1 overlap distance in the direction of normal. """
+                obj1.pos += normal * overlap
               
         # --- Update the screen with what we've drawn.
         pygame.display.update()

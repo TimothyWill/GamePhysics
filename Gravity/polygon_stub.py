@@ -34,14 +34,15 @@ class Polygon:
         center = Vec2d(0,0)
         for i in range(len(pp)):
             #> area of triangle, and add to total area
-            A = pp[i].cross(pp[i - 1])/2
-            self.area += A
+            a = pp[i].cross(pp[i - 1])/2
+            self.area += a
             #> moment of triange about vertex
-            self.moment = (1/6)*self.mass*(abs(pp[i]).mag2() + abs(pp[i-1]).mag2() + pp[i].dot(pp[i-1]))
+            self.moment = (1/6)*self.density*a*((pp[i].mag() * pp[i].mag()) + ((pp[i-1]).mag() * pp[i-1].mag()) + (pp[i].dot(pp[i-1])))
             #> add center of mass of triange to center of mass of shape
-            center += A * (pp[i] + pp[i-1])/3
+            center += a * (pp[i] + pp[i-1])/3
             pass
         center *= 1/self.area
+        self.area = abs(self.area)
         self.mass = density*self.area
         print("center =", center)
         print("area =", self.area)
@@ -53,8 +54,9 @@ class Polygon:
         self.pos += center
         
         #> Shift moment to be about center of mass (parallel axis theorem)
-        Iother = center + self.mass * self.pos.mag2()
-        center = Iother - self.mass * self.pos.mag2()
+        #Iother = center + self.mass * self.pos.mag2()
+        #center = Iother - self.mass * self.pos.mag2()
+        self.moment = self.moment - self.mass * abs(center.mag() * center.mag())
         
         print("moment =", self.moment)
         #print(pp)
@@ -63,8 +65,9 @@ class Polygon:
         moment = 0
         for i in range(len(pp)):
             #> same as above loop to tally moment of each triangle about vertex
-            self.moment += (1/6)*self.density*self.area*(abs(pp[i]).mag2() + abs(pp[i-1]).mag2() + pp[i].dot(pp[i-1]))
-            pass
+            #self.moment += (1/6)*self.density*self.area*(abs(pp[i]).mag2() + abs(pp[i-1]).mag2() + pp[i].dot(pp[i-1]))
+            #pass
+            moment = (1/6)*self.density*a*((pp[i].mag() * pp[i].mag()) + (pp[i-1].mag() * pp[i-1].mag()) + (pp[i].dot(pp[i-1])))
         print("moment =", moment)
         
         # Calculate normals to each points
@@ -114,12 +117,14 @@ class Polygon:
         c = cos(self.angle)
         s = sin(self.angle)
         #> use s and c to calculate points and normals rotated
-        for i in range(len(self.points)):
-            self.points[i].x = self.origpoints[i].x * c - self.origpoints[i].y * s
-            self.points[i].y = self.origpoints[i].y * c + self.origpoints[i].x * s
+        pp = self.origpoints
+        n = self.orignormals
+        for i in range(len(pp)):
+            self.points[i].x = pp[i].x * c - pp[i].y * s
+            self.points[i].y = pp[i].y * c + pp[i].x * s
         for i in range(len(self.normals)):
-            self.normals[i].x = self.orignormals[i].x * c - self.orignormals[i].y * s
-            self.normals[i].y = self.orignormals[i].y * c + self.orignormals[i].x * s
+            self.normals[i].x = n[i].x * c - n[i].y * s
+            self.normals[i].y = n[i].y * c + n[i].x * s
             
 
     def update(self, dt):
@@ -158,42 +163,31 @@ class Polygon:
                 via result.extend(), the overlap, point and normal involved; 
                 return True. """
             
-            
-            # Create a list of Vec2d values for deepest values
-            maxJ = []
-            maxD = 0;
-            overlap = 0
-            normal = 0
             # Loop through all the walls in other
             for i in range(len(other.normals)):
                 # Give deepest a starting value
-                maxJ.append(self.points[0] + self.pos)
                 maxD = -99999
                 # Calculate rOther
+                currentNormal = other.normals[i]
                 rOther = other.pos + other.points[i]
                 # loop through all the points in self
                 for j in range(len(self.points)):
                     rSelf = self.pos + self.points[j]
-                    d = (rOther - rSelf).dot(other.normals[i])
+                    d = (rOther - rSelf).dot(currentNormal)
                     print("d: " + str(d))
                     # check whether the new point is deeper than the current deppest point
                     if (d > maxD):
                         # Change deepest if needed
                         maxD = d
-                        maxJ[i]= j
+                        maxPoint = rSelf
                 if (maxD < overlap):
-                        
+                    if maxD < 1e-13:
+                        return False
                     overlap = maxD
-                    normal = other.normals[i]
-                        
-            print ("MaxD: ")
-            print(maxD)
+                    normal = currentNormal
+                    point = maxPoint
             
             # Extend the result to the result variable
-                
-            if overlap < 0:
-                return False
-            
-            result.extend([self, other, overlap, normal, self.points[maxJ[0]] + self.pos])
+            result.extend([self, other, overlap, normal, point])
             return True
     
