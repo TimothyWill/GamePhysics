@@ -90,6 +90,8 @@ def resolve_collision(result):
     deltaVn = -(1 + e) * Vrel * n.hat
     deltaVt = -Vrel * tHat
 
+    I1 = a.moment
+
     A = 1/a.mass + rt * rt / 
     B = 
     C = 
