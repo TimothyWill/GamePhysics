@@ -81,6 +81,29 @@ def resolve_collision(result):
     mu = 0.4
     m = a.mass*b.mass/(a.mass + b.mass) # reduced mass
     
+    # Initialize Some Variables
+    tHat = n.hat.perp
+    r1 = pt - a.pos
+    rt = r1 * rHat
+    rn = r1 * n.hat
+    Vrel = a.vel + a.angvel * r1.perpendicular
+    deltaVn = -(1 + e) * Vrel * n.hat
+    deltaVt = -Vrel * tHat
+
+    A = 1/a.mass + rt * rt / 
+    B = 
+    C = 
+    D = 
+
+    Jn = deltaVn 
+    Jt = 
+    
+    # Case for the wall
+    
+    
+    # --TODO--
+    # Case for the Polygons
+    
     # depenetrate
 
     # distance vectors
@@ -92,6 +115,7 @@ def resolve_collision(result):
     
     # Solve matrix equation
         # check if friction is strong enough to prevent slipping
+    if Math.abs(Jt) > mu * Jn:
         J = Jn*n + Jt*t
         a.impulse( J, pt)
         b.impulse(-J, pt)
