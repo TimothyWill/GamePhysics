@@ -48,7 +48,7 @@ def gravity_force(obj1, obj2):
     obj2.force -= force
 
 def collides(obj1, obj2):
-    if (obj1.pos.get_distance(obj2.pos) < obj1.radius + obj2.radius):
+    '''if (obj1.pos.get_distance(obj2.pos) < obj1.radius + obj2.radius):
         e = 0.5
         m1 = obj1.mass
         m2 = obj2.mass
@@ -69,7 +69,27 @@ def collides(obj1, obj2):
             obj1.mom += J * n
             obj2.mom -= J * n
             obj1.update_vel()
-            obj2.update_vel()
+            obj2.update_vel()'''
+            
+    nHat = (obj1.pos - obj2.pos).normalized()
+    tHat = nHat.perpendicular()
+    vt = (obj1.vel - obj2.vel).dot(tHat) + obj1.radius * obj1.angvel + obj2.radius * obj2.angvel
+    mt = 1/((1/obj1.mass) + ((obj1.radius * obj1.radius)/obj1.moment) +
+            (1/obj2.mass) + ((obj2.radius * obj2.radius)/obj2.moment))
+    
+    d = (obj1.radius + obj2.radius) - (obj1.pos - obj2.pos).mag()
+    if(d > 0):
+        mu = 1/((1/obj1.mass) + (1/obj2.mass))
+        vn = (obj1.vel - obj2.vel).dot(nHat)
+        J = -1.6 * mu * vn
+        obj1.pos += (mu/obj1.mass) * d * nHat
+        obj2.pos -= (mu/obj2.mass) * d * nHat
+        if J < 0:
+            J_friction = -mt * vt
+            r = obj1.pos - obj2.pos
+            imp = J * nHat + J_friction * tHat
+            obj1.impulse(imp, r)
+            obj2.impulse(-imp, r)      
             
 def collideWithWalls(obj, wall):
     R = obj.radius
@@ -80,38 +100,15 @@ def collideWithWalls(obj, wall):
     mT = 1/((1/obj.mass)+((R*R)/obj.moment))
     if (d > 0):
         m = obj.mass
-        #r = obj.pos - wall.pos1
         u = m
         v1 = obj.vel
         J = 1.6*u*((v1).dot(n))
-        
-        #d = obj.radius - (r).dot(n.hat())
-        #L = u*r.cross(v1)
-        #Jang = -d*L/(r.mag()*(r.mag()+d)) * n.perpendicular()
-        #obj.mom -= Jang
         obj.pos = obj.pos + (u/m)*d*n
         if (J < 0):
-            #obj.mom -= J * n
-            #obj.impulse(J, None)
-            
-            #Fric = -obj.mass * obj.vel.dot(tangent)
-            Fric = -mT*vT
-            cf = 0.75 # Coefficient of Friction
-            
-            if (abs(Fric) > cf * abs(J)):
-                ratio = cf * abs(J)/abs(Fric)
-                Fric *= ratio
-            else:
-                ratio = 1
-            
-            #ratio *= obj.vel.dot(tangent)/obj.vel.dot(n)
-           # obj.pos -= (obj.radius - d) * ratio * tangent
+            Fric = -mT*vT                
             r = obj.pos-obj.radius*n
-            #obj.mom -= Fric * tangent
             imp = -J * n + Fric * tangent
             obj.impulse(imp, r)
-        
-        
             
 # Add a new circle to the scene
 def addNewBall(width, height, objects, zoom, position, coords, velocity):
