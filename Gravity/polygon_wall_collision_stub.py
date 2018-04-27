@@ -117,15 +117,16 @@ def resolve_collision(result):
     
     if Jn > 0:
         if abs(Jt) > mu * Jn:
-            f = mu
+            s = mu
             if Jt < 0:
-                f *= -1
-            Jn = deltaVn/(1/m + rat*(rat - f*ran)/a.moment
-                              + rbt*(rbt - f*rbn)/b.moment)
-            Jt = f*Jn
+                s *= -1
+            Jn = deltaVn/(1/m + rat*(rat - s*ran)/a.moment
+                              + rbt*(rbt - s*rbn)/b.moment)
+            #Jn = (deltaVn + B*Jt)/A
+            Jt = s*Jn
         J = Jn*nHat + Jt*tHat
         a.impulse(J,pt)
-        b.impulse(-J,pt)
+        #b.impulse(-J,pt)
     
 def main():
     pygame.init()
@@ -171,7 +172,7 @@ def main():
     # -------- Main Program Loop -----------\
     frame_rate = 60
     n_per_frame = 1
-    playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
+    playback_speed = .1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate/n_per_frame
     #print("timestep =", dt)
     done = False
@@ -214,6 +215,8 @@ def main():
                             if check_collision(objects[i1], objects[i2], result):
                                 resolve_collision(result)
                                 collided = True
+                                print("Collision")
+                                paused = True
                     if not collided: # if all collisions resolved, then we're done
                         break
  

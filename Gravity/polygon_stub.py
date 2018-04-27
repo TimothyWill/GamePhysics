@@ -200,7 +200,8 @@ class Polygon:
             for j in range(len(self.points)):
                 rSelf = self.pos + self.points[j]
                 d = (rOther - rSelf).dot(currentNormal)
-                print("d: " + str(d))
+                if d > 0:
+                    print("d: " + str(d))
                 # check whether the new point is deeper than the current deppest point
                 if (d > maxD):
                     # Change deepest if needed
