@@ -190,4 +190,30 @@ class Polygon:
             # Extend the result to the result variable
             result.extend([self, other, overlap, normal, point])
             return True
+        if other.type == "wall":
+            # Give deepest a starting value
+            maxD = -99999
+            # Calculate rOther
+            currentNormal = other.normal
+            rOther = other.pos
+            # loop through all the points in self
+            for j in range(len(self.points)):
+                rSelf = self.pos + self.points[j]
+                d = (rOther - rSelf).dot(currentNormal)
+                print("d: " + str(d))
+                # check whether the new point is deeper than the current deppest point
+                if (d > maxD):
+                    # Change deepest if needed
+                    maxD = d
+                    maxPoint = rSelf
+            if (maxD < overlap):
+                if maxD < 1e-13:
+                    return False
+                overlap = maxD
+                normal = currentNormal
+                point = maxPoint
+            
+            # Extend the result to the result variable
+            result.extend([self, other, overlap, normal, point])
+            return True
     

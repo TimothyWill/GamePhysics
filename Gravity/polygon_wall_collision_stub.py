@@ -7,8 +7,8 @@ Created on Fri Oct 27 13:56:44 2017
 import pygame
 from vec2d import Vec2d
 from coords import Coords
-from polygon import Polygon
-from wall import Wall
+from polygon_stub import Polygon
+from wallPolygon import Wall
 from math import sqrt, acos, degrees, sin, cos
 from random import uniform, randint, random
 
@@ -81,47 +81,52 @@ def resolve_collision(result):
     mu = 0.4
     m = a.mass*b.mass/(a.mass + b.mass) # reduced mass
     
-    # Initialize Some Variables
-    tHat = n.hat.perp
-    r1 = pt - a.pos
-    rt = r1 * rHat
-    rn = r1 * n.hat
-    Vrel = a.vel + a.angvel * r1.perpendicular
-    deltaVn = -(1 + e) * Vrel * n.hat
-    deltaVt = -Vrel * tHat
-
-    I1 = a.moment
-
-    A = 1/a.mass + rt * rt / 
-    B = 
-    C = 
-    D = 
-
-    Jn = deltaVn 
-    Jt = 
-    
-    # Case for the wall
-    
-    
-    # --TODO--
-    # Case for the Polygons
-    
     # depenetrate
+    a.pos += d*n*m/a.mass
+    pt += d*n*m/a.mass
+    b.pos -= d*n*m/b.mass
+    
+    # Initialize Some Variables
+    tHat = n.perpendicular()
+    nHat = n 
+    
+    ra = pt - a.pos
+    rb = pt - b.pos
+    ran = ra.dot(nHat)
+    rat = ra.dot(tHat)
+    rbn = rb.dot(nHat)
+    rbt = rb.dot(tHat)
+    
+    Vrel = (a.vel + a.angvel * ra.perpendicular()
+            - b.vel + b.angvel * rb.perpendicular())
+    
+    vn = Vrel.dot(nHat)
+    vt = Vrel.dot(tHat)
+    
+    deltaVn = -(1 + e) * vn
+    deltaVt = -vt
 
-    # distance vectors
+    A = 1/m + rat*rat/a.moment + rbt*rbt/b.moment
+    B = -ran*rat/a.moment - rbn*rbt/b.moment
+    C = B
+    D = 1/m + ran*ran/a.moment + rbn*rbn/b.moment
+    det = A*D - B*C
+
+    Jn = (D*deltaVn - B*deltaVt)/det
+    Jt = (-C*deltaVn + A*deltaVt)/det
     
-    # relative velocity of points in contact
-    # target velocity change (delta v)
+    if Jn > 0:
+        if abs(Jt) > mu * Jn:
+            f = mu
+            if Jt < 0:
+                f *= -1
+            Jn = deltaVn/(1/m + rat*(rat - f*ran)/a.moment
+                              + rbt*(rbt - f*rbn)/b.moment)
+            Jt = f*Jn
+        J = Jn*nHat + Jt*tHat
+        a.impulse(J,pt)
+        b.impulse(-J,pt)
     
-    # matrix [[A B][C D]] [Jn Jt]T = [dvn dvt]T
-    
-    # Solve matrix equation
-        # check if friction is strong enough to prevent slipping
-    if Math.abs(Jt) > mu * Jn:
-        J = Jn*n + Jt*t
-        a.impulse( J, pt)
-        b.impulse(-J, pt)
- 
 def main():
     pygame.init()
  
@@ -154,14 +159,14 @@ def main():
     height = 1
     area = length*height
     objects.append(Polygon(Vec2d(0,-1), Vec2d(0,0), 1, make_rectangle(length, height), GRAY, 0, -1))
-    objects.append(Polygon(Vec2d(-0.5,1), Vec2d(0,0), 1, make_polygon(0.2,4,0,10), RED, 0, 1))
-    objects.append(Polygon(Vec2d(1,0), Vec2d(0,0), 1, make_polygon(0.3,7,0,3), BLUE, 0, -0.4))
-    objects.append(Polygon(Vec2d(-1,0), Vec2d(0,0), 1, make_polygon(1,3,0,0.5), GREEN, 0, 2))
+    #objects.append(Polygon(Vec2d(-0.5,1), Vec2d(0,0), 1, make_polygon(0.2,4,0,10), RED, 0, 1))
+    #objects.append(Polygon(Vec2d(1,0), Vec2d(0,0), 1, make_polygon(0.3,7,0,3), BLUE, 0, -0.4))
+    #objects.append(Polygon(Vec2d(-1,0), Vec2d(0,0), 1, make_polygon(1,3,0,0.5), GREEN, 0, 2))
     
     # Walls
     objects.append(Wall(Vec2d(-1,-3), Vec2d(1,1), BLACK))
     objects.append(Wall(Vec2d(-1,-3), Vec2d(-1,2), BLACK))
-    objects.append(Wall(Vec2d(-1,-3), Vec2d(0,1), BLACK))
+    #objects.append(Wall(Vec2d(-1,-3), Vec2d(0,1), BLACK))
 
     # -------- Main Program Loop -----------\
     frame_rate = 60
