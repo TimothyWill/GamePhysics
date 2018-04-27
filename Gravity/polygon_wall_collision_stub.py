@@ -98,7 +98,7 @@ def resolve_collision(result):
     rbt = rb.dot(tHat)
     
     Vrel = (a.vel + a.angvel * ra.perpendicular()
-            - b.vel + b.angvel * rb.perpendicular())
+            - (b.vel + b.angvel * rb.perpendicular()))
     
     vn = Vrel.dot(nHat)
     vt = Vrel.dot(tHat)
@@ -115,7 +115,7 @@ def resolve_collision(result):
     Jn = (D*deltaVn - B*deltaVt)/det
     Jt = (-C*deltaVn + A*deltaVt)/det
     
-    if Jn > 0:
+    if deltaVn > 0:
         if abs(Jt) > mu * Jn:
             s = mu
             if Jt < 0:
@@ -125,8 +125,9 @@ def resolve_collision(result):
             #Jn = (deltaVn + B*Jt)/A
             Jt = s*Jn
         J = Jn*nHat + Jt*tHat
+        print("J: ", J)
         a.impulse(J,pt)
-        #b.impulse(-J,pt)
+        b.impulse(-J,pt)
     
 def main():
     pygame.init()

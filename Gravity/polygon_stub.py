@@ -137,6 +137,7 @@ class Polygon:
         if point is not None:
             self.angmom += (point - self.pos).cross(imp)  
             self.update_angvel()
+            print("w: ", self.angvel)
 
     def draw(self, screen, coords):
         # Draw polygon
