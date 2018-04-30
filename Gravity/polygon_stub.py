@@ -34,10 +34,10 @@ class Polygon:
         center = Vec2d(0,0)
         for i in range(len(pp)):
             #> area of triangle, and add to total area
-            a = pp[i].cross(pp[i - 1])/2
+            a = abs(pp[i].cross(pp[i - 1])/2)
             self.area += a
             #> moment of triange about vertex
-            self.moment = (1/6)*self.density*a*((pp[i].mag() * pp[i].mag()) + ((pp[i-1]).mag() * pp[i-1].mag()) + (pp[i].dot(pp[i-1])))
+            self.moment += (1/6)*self.density*a*((pp[i].mag() * pp[i].mag()) + ((pp[i-1]).mag() * pp[i-1].mag()) + (pp[i].dot(pp[i-1])))
             #> add center of mass of triange to center of mass of shape
             center += a * (pp[i] + pp[i-1])/3
             pass
@@ -54,9 +54,7 @@ class Polygon:
         self.pos += center
         
         #> Shift moment to be about center of mass (parallel axis theorem)
-        #Iother = center + self.mass * self.pos.mag2()
-        #center = Iother - self.mass * self.pos.mag2()
-        self.moment = self.moment - self.mass * abs(center.mag() * center.mag())
+        self.moment = self.moment - center.mag2() * self.mass * self.area
         
         print("moment =", self.moment)
         #print(pp)
@@ -65,9 +63,7 @@ class Polygon:
         moment = 0
         for i in range(len(pp)):
             #> same as above loop to tally moment of each triangle about vertex
-            #self.moment += (1/6)*self.density*self.area*(abs(pp[i]).mag2() + abs(pp[i-1]).mag2() + pp[i].dot(pp[i-1]))
-            #pass
-            moment = (1/6)*self.density*a*((pp[i].mag() * pp[i].mag()) + (pp[i-1].mag() * pp[i-1].mag()) + (pp[i].dot(pp[i-1])))
+            moment += (1/6)*self.density*a*((pp[i].mag2() + pp[i-1].mag2() + pp[i].dot(pp[i-1])))
         print("moment =", moment)
         
         # Calculate normals to each points

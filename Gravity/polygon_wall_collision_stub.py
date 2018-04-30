@@ -173,7 +173,7 @@ def main():
     # -------- Main Program Loop -----------\
     frame_rate = 60
     n_per_frame = 1
-    playback_speed = .1 # 1 is real time, 10 is 10x real speed, etc.
+    playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate/n_per_frame
     #print("timestep =", dt)
     done = False
