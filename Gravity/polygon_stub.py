@@ -44,9 +44,9 @@ class Polygon:
         center *= 1/self.area
         self.area = abs(self.area)
         self.mass = density*self.area
-        print("center =", center)
-        print("area =", self.area)
-        print("mass =", self.mass)
+        #print("center =", center)
+        #print("area =", self.area)
+        #print("mass =", self.mass)
 
         # Shift self.origpoints to be centered on center of mass
         for p in self.origpoints:
@@ -56,7 +56,7 @@ class Polygon:
         #> Shift moment to be about center of mass (parallel axis theorem)
         self.moment = self.moment - center.mag2() * self.mass * self.area
         
-        print("moment =", self.moment)
+        #print("moment =", self.moment)
         #print(pp)
 
         # Recalculate moment around the center of mass as a check
@@ -64,7 +64,7 @@ class Polygon:
         for i in range(len(pp)):
             #> same as above loop to tally moment of each triangle about vertex
             moment += (1/6)*self.density*a*((pp[i].mag2() + pp[i-1].mag2() + pp[i].dot(pp[i-1])))
-        print("moment =", moment)
+        #print("moment =", moment)
         
         # Calculate normals to each points
         self.orignormals = []
@@ -133,7 +133,7 @@ class Polygon:
         if point is not None:
             self.angmom += (point - self.pos).cross(imp)  
             self.update_angvel()
-            print("w: ", self.angvel)
+            #print("w: ", self.angvel)
 
     def draw(self, screen, coords):
         # Draw polygon
@@ -171,7 +171,7 @@ class Polygon:
                 for j in range(len(self.points)):
                     rSelf = self.pos + self.points[j]
                     d = (rOther - rSelf).dot(currentNormal)
-                    print("d: " + str(d))
+                    #print("d: " + str(d))
                     # check whether the new point is deeper than the current deppest point
                     if (d > maxD):
                         # Change deepest if needed
@@ -197,8 +197,7 @@ class Polygon:
             for j in range(len(self.points)):
                 rSelf = self.pos + self.points[j]
                 d = (rOther - rSelf).dot(currentNormal)
-                if d > 0:
-                    print("d: " + str(d))
+                    #print("d: " + str(d))
                 # check whether the new point is deeper than the current deppest point
                 if (d > maxD):
                     # Change deepest if needed

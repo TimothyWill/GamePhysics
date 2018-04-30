@@ -217,7 +217,7 @@ def main():
                                 resolve_collision(result)
                                 collided = True
                                 print("Collision")
-                                paused = True
+                                #paused = True
                     if not collided: # if all collisions resolved, then we're done
                         break
  
