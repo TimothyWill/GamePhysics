@@ -124,10 +124,13 @@ def resolve_collision(result):
                               + rbt*(rbt - s*rbn)/b.moment)
             #Jn = (deltaVn + B*Jt)/A
             Jt = s*Jn
-        J = Jn*nHat + Jt*tHat
+            
+        PE = d*m*10
+        J = Jn*nHat + Jt*tHat + Vec2d(0,PE)
         #print("J: ", J)
         a.impulse(J,pt)
         b.impulse(-J,pt)
+
     
 def main():
     pygame.init()
