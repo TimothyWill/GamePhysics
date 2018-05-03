@@ -78,7 +78,10 @@ def check_collision(a, b, result=[]):
 def resolve_collision(result):
     (a, b, d, n, pt) = result
     e = 0.0
-    mu = 0.4
+    if a.type == "wall" or b.type == "wall":
+        mu = 1.0
+    else:
+        mu = 0.4
     m = a.mass*b.mass/(a.mass + b.mass) # reduced mass
     
     # depenetrate
@@ -124,12 +127,12 @@ def resolve_collision(result):
                               + rbt*(rbt - s*rbn)/b.moment)
             #Jn = (deltaVn + B*Jt)/A
             Jt = s*Jn
-            
-        PE = d*m*10
-        J = Jn*nHat + Jt*tHat + Vec2d(0,PE)
-        #print("J: ", J)
-        a.impulse(J,pt)
-        b.impulse(-J,pt)
+        
+        PE = d*m*-10
+        Ja = Jn*nHat + Jt*tHat - Vec2d(0,PE)
+        Jb = Jn*nHat + Jt*tHat + Vec2d(0,PE)
+        a.impulse(Ja,pt)
+        b.impulse(-Jb,pt)
 
     
 def main():
@@ -164,11 +167,11 @@ def main():
     height = 1
     area = length*height
     objects.append(Polygon(Vec2d(0,-1), Vec2d(0,0), 1, make_rectangle(length, height), GRAY, 0, 0))
-    objects.append(Polygon(Vec2d(0, 0), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
-#    objects.append(Polygon(Vec2d(-1, 0), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
-#    objects.append(Polygon(Vec2d(1, 0), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
+    objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(0.1, 3), GRAY, 0, 0))
+    #objects.append(Polygon(Vec2d(-.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
+    #objects.append(Polygon(Vec2d(.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
     #objects.append(Polygon(Vec2d(0, 1), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
-    objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(2.0, 1.0), GRAY, 0, 0))
+    #objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(2.0, 1.0), GRAY, 0, 0))
     #objects.append(Polygon(Vec2d(-0.5,1), Vec2d(0,0), 1, make_polygon(0.2,4,0,10), RED, 0, 1))
     #objects.append(Polygon(Vec2d(1,0), Vec2d(0,0), 1, make_polygon(0.3,7,0,3), BLUE, 0, -0.4))
     #objects.append(Polygon(Vec2d(-1,0), Vec2d(0,0), 1, make_polygon(1,3,0,0.5), GREEN, 0, 2))
@@ -178,7 +181,7 @@ def main():
 
     # -------- Main Program Loop -----------\
     frame_rate = 60
-    n_per_frame = 12
+    n_per_frame = 10
     playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate/n_per_frame
     #print("timestep =", dt)
