@@ -10,7 +10,7 @@ from coords import Coords
 from polygon_stub import Polygon
 from wallPolygon import Wall
 from math import sqrt, acos, degrees, sin, cos
-from random import uniform, randint, random
+from random import randint, random
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -19,6 +19,7 @@ GREEN    = (   0, 255,   0)
 RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
+CLEARGRAY     = ( 127, 127, 127, 10)
 
 def random_color():
     return (randint(0,255), randint(0,255), randint(0,255))
@@ -65,9 +66,6 @@ def check_collision(a, b, result=[]):
     result1 = []
     result2 = []
     if a.check_collision(b, result1) and b.check_collision(a, result2):
-        #print("collision")
-        #print(a.color, result1[2:])
-        #print(b.color, result2[2:])
         if result1[2] < result2[2]: # compare overlaps, which is smaller
             result.extend(result1)
         else:
@@ -137,6 +135,10 @@ def resolve_collision(result):
     
 def main():
     pygame.init()
+    
+    #Import images
+    background = pygame.image.load("background.jpg")
+    background = pygame.transform.scale(background, (800, 600))
  
     width = 800
     height = 600
@@ -148,92 +150,173 @@ def main():
     
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
-
-    # Create initial objects to demonstrate
-    objects = []
-    points = (Vec2d(0,0),
-              Vec2d(1,0),
-              Vec2d(1,0.5),
-              Vec2d(0.5,0.5),
-              Vec2d(0.5,1),
-              Vec2d(0,1),
-              )
-    #area = 2*1
-    #print(area/12*(2**2 + 1**2))
-    #area = 0.5*points[1].cross(points[2])
-    #print(area)
-    #print(abs(area/18*(points[1].mag2() + points[2].mag2() - points[1].dot(points[2]))))
-    length = 2
-    height = 1
-    area = length*height
-    objects.append(Polygon(Vec2d(0,-1), Vec2d(0,0), 1, make_rectangle(length, height), GRAY, 0, 0))
-    objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(0.1, 3), GRAY, 0, 0))
-    #objects.append(Polygon(Vec2d(-.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
-    #objects.append(Polygon(Vec2d(.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
-    #objects.append(Polygon(Vec2d(0, 1), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
-    #objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(2.0, 1.0), GRAY, 0, 0))
-    #objects.append(Polygon(Vec2d(-0.5,1), Vec2d(0,0), 1, make_polygon(0.2,4,0,10), RED, 0, 1))
-    #objects.append(Polygon(Vec2d(1,0), Vec2d(0,0), 1, make_polygon(0.3,7,0,3), BLUE, 0, -0.4))
-    #objects.append(Polygon(Vec2d(-1,0), Vec2d(0,0), 1, make_polygon(1,3,0,0.5), GREEN, 0, 2))
     
-    # Walls
-    objects.append(Wall(Vec2d(-1,-1.5), Vec2d(0,1), BLACK))
+    # Initialize menu
+    startButton = pygame.Rect(250, 200, 300, 50)
+    controlsButton = pygame.Rect(250, 300, 300, 50)
+    quitButton = pygame.Rect(250, 400, 300, 50)
+    backButton = pygame.Rect(250, 500, 300, 50)
+    
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
+    title = myfont.render('GRUMPY LIZADS', False, (0, 0, 0))
+    play = myfont.render('Play', False, (0, 0, 0))
+    controls = myfont.render('Controls', False, (0, 0, 0))
+    quitGame = myfont.render('Quit', False, (0, 0, 0))
+    back = myfont.render('Back', False, (0, 0, 0))
 
     # -------- Main Program Loop -----------\
     frame_rate = 60
     n_per_frame = 10
     playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate/n_per_frame
-    #print("timestep =", dt)
-    done = False
-    paused = True
-    max_collisions = 1
-    result = []
-    while not done:
-        # --- Main event loop
-        for event in pygame.event.get(): 
-            if event.type == pygame.QUIT: # If user clicked close
-                done = True
-                paused = True
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                paused = False
-            elif event.type == pygame.KEYDOWN: 
-                if event.key == pygame.K_ESCAPE:
-                    done = True
-                    paused = True 
-                elif event.key == pygame.K_SPACE:
-                    paused = not paused
-                else:
-                    paused = False
-        
-        if not paused:
-            for N in range(n_per_frame):
-                # Physics
-                # Calculate the force on each object
-                for obj in objects:
-                    obj.force.zero()
-                    obj.force += Vec2d(0,-10) # gravity
-           
-                # Move each object according to physics
-                for obj in objects:
-                    obj.update(dt)
+
+    # Main game loop
+    exitGame = False
+    while not exitGame:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exitGame = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = event.pos  # gets mouse position
+
+                # checks if mouse position is over the button
+                if quitButton.collidepoint(mouse_pos):
+                    exitGame = True
+                if controlsButton.collidepoint(mouse_pos):
+                    player1 = myfont.render('Player 1', False, (0, 0, 0))
+                    player2 = myfont.render('Player 2', False, (0, 0, 0))
+                    elevate = myfont.render('Elevate', False, (0, 0, 0))
+                    fire = myfont.render('Fire', False, (0, 0, 0))
+                    wText = myfont.render('W', False, (0, 0, 0))
+                    eText = myfont.render('E', False, (0, 0, 0))
+                    iText = myfont.render('I', False, (0, 0, 0))
+                    uText = myfont.render('U', False, (0, 0, 0))
+                    controlsDone = False
+                    while not controlsDone:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT: # If user clicked close
+                                controlsDone = True
+                                exitGame = True
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                mouse_pos = event.pos
+                                
+                                if backButton.collidepoint(mouse_pos):
+                                    controlsDone = True
+                        # Draw
+                        screen.blit(background, (0,0))
+                        screen.blit(title, (275,100))
+                        
+                        pygame.draw.rect(screen, GRAY, backButton)
+                        screen.blit(back, (370,500))
+                        
+                        screen.blit(player1, (200, 150))
+                        screen.blit(player2, (500, 150))
+                        
+                        screen.fill(CLEARGRAY, pygame.Rect(200, 250, 400, 50), pygame.BLEND_MAX)
+                        screen.fill(CLEARGRAY, pygame.Rect(200, 350, 400, 50), pygame.BLEND_MAX)
+                        
+                        screen.blit(elevate, (350, 250))
+                        screen.blit(fire, (370, 350))
+                        
+                        screen.blit(wText, (230, 250))
+                        screen.blit(eText, (230, 350))
+                        screen.blit(iText, (550, 250))
+                        screen.blit(uText, (550, 350))
+                        
+                        # --- Update the screen with what we've drawn.
+                        pygame.display.update()
                     
-                for i in range(max_collisions):
-                    collided = False
-                    for i1 in range(len(objects)):
-                        for i2 in range(i1):
-                            if check_collision(objects[i1], objects[i2], result):
-                                resolve_collision(result)
-                                collided = True
-                                #print("Collision")
-                                #paused = True
-                    if not collided: # if all collisions resolved, then we're done
-                        break
- 
-        # Drawing
-        screen.fill(WHITE) # wipe the screen
-        for obj in objects:
-            obj.draw(screen, coords) # draw object to screen
+                        # This limits the loop to 60 frames per second
+                        clock.tick(frame_rate)
+                if startButton.collidepoint(mouse_pos):
+                    # Create initial objects to demonstrate
+                    objects = []
+                
+                    objects.append(Polygon(Vec2d(0,-1), Vec2d(0,0), 1, make_rectangle(2, 1), GRAY, 0, 0))
+                    objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(0.1, 3), GRAY, 0, 0))
+                    #objects.append(Polygon(Vec2d(-.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
+                    #objects.append(Polygon(Vec2d(.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
+                    #objects.append(Polygon(Vec2d(0, 1), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
+                    #objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(2.0, 1.0), GRAY, 0, 0))
+                    #objects.append(Polygon(Vec2d(-0.5,1), Vec2d(0,0), 1, make_polygon(0.2,4,0,10), RED, 0, 1))
+                    #objects.append(Polygon(Vec2d(1,0), Vec2d(0,0), 1, make_polygon(0.3,7,0,3), BLUE, 0, -0.4))
+                    #objects.append(Polygon(Vec2d(-1,0), Vec2d(0,0), 1, make_polygon(1,3,0,0.5), GREEN, 0, 2))
+                    
+                    # Walls
+                    objects.append(Wall(Vec2d(-1,-1.5), Vec2d(0,1), BLACK))
+    
+                    done = False
+                    paused = True
+                    max_collisions = 1
+                    result = []
+                    while not done:
+                        # --- Main event loop
+                        for event in pygame.event.get(): 
+                            if event.type == pygame.QUIT: # If user clicked close
+                                objects = []
+                                exitGame = True
+                                done = True
+                                paused = True
+                            elif event.type == pygame.MOUSEBUTTONDOWN:
+                                paused = False
+                            elif event.type == pygame.KEYDOWN: 
+                                if event.key == pygame.K_ESCAPE:
+                                    objects = []
+                                    done = True
+                                    paused = True 
+                                elif event.key == pygame.K_SPACE:
+                                    paused = not paused
+                                else:
+                                    paused = False
+                        
+                        if not paused:
+                            for N in range(n_per_frame):
+                                # Physics
+                                # Calculate the force on each object
+                                for obj in objects:
+                                    obj.force.zero()
+                                    obj.force += Vec2d(0,-10) # gravity
+                           
+                                # Move each object according to physics
+                                for obj in objects:
+                                    obj.update(dt)
+                                    
+                                for i in range(max_collisions):
+                                    collided = False
+                                    for i1 in range(len(objects)):
+                                        for i2 in range(i1):
+                                            if check_collision(objects[i1], objects[i2], result):
+                                                resolve_collision(result)
+                                                collided = True
+                                                #print("Collision")
+                                                #paused = True
+                                    if not collided: # if all collisions resolved, then we're done
+                                        break
+                 
+                        # Drawing
+                        screen.fill(WHITE) # wipe the screen
+                        for obj in objects:
+                            obj.draw(screen, coords) # draw object to screen
+                            
+                        # --- Update the screen with what we've drawn.
+                        pygame.display.update()
+        
+                        # This limits the loop to the specified frame rate
+                        clock.tick(frame_rate)
+
+        # Draw background
+        screen.blit(background, (0,0))
+            
+        # Draw buttons
+        pygame.draw.rect(screen, GRAY, startButton)
+        pygame.draw.rect(screen, GRAY, controlsButton)
+        pygame.draw.rect(screen, GRAY, quitButton)
+    
+        # Draw Text
+        screen.blit(title, (275,100))
+        screen.blit(play, (370,200))
+        screen.blit(controls, (340,300))
+        screen.blit(quitGame, (370,400))
 
         # --- Update the screen with what we've drawn.
         pygame.display.update()
