@@ -11,6 +11,7 @@ from polygon_stub import Polygon
 from wallPolygon import Wall
 from math import sqrt, acos, degrees, sin, cos
 from random import randint, random
+from decimal import Decimal
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -129,9 +130,14 @@ def resolve_collision(result):
         PE = d*m*-10
         Ja = Jn*nHat + Jt*tHat - Vec2d(0,PE)
         Jb = Jn*nHat + Jt*tHat + Vec2d(0,PE)
+        
+        if a.type == "polygon" and b.type == "polygon":
+            if not a.breakable and b.breakable:
+                if Jb.x > 2 or Jb.x < -2 or Jb.y > 2 or Jb.y < -2:
+                    b.destroyed = True
+        
         a.impulse(Ja,pt)
         b.impulse(-Jb,pt)
-
     
 def main():
     pygame.init()
@@ -140,8 +146,11 @@ def main():
     mouseDownPosition = Vec2d(-1, -1);
     
     #Import images
-    background = pygame.image.load("background.jpg")
-    background = pygame.transform.scale(background, (800, 600))
+    background = pygame.image.load("background.png")
+    background = pygame.transform.scale(background, (1600, 600))
+    
+    background2 = pygame.image.load("background2.png")
+    background2 = pygame.transform.scale(background2, (1600, 600))
  
     width = 800
     height = 600
@@ -190,14 +199,9 @@ def main():
                 if quitButton.collidepoint(mouse_pos):
                     exitGame = True
                 if controlsButton.collidepoint(mouse_pos):
-                    player1 = myfont.render('Player 1', False, (0, 0, 0))
-                    player2 = myfont.render('Player 2', False, (0, 0, 0))
-                    elevate = myfont.render('Elevate', False, (0, 0, 0))
-                    fire = myfont.render('Fire', False, (0, 0, 0))
-                    wText = myfont.render('W', False, (0, 0, 0))
-                    eText = myfont.render('E', False, (0, 0, 0))
-                    iText = myfont.render('I', False, (0, 0, 0))
-                    uText = myfont.render('U', False, (0, 0, 0))
+                    fire = myfont.render('Fire:   Left Click and Drag', False, (0, 0, 0))
+                    panRight = myfont.render('Pan Right:   Right Arrow Key', False, (0, 0, 0))
+                    panLeft = myfont.render('Pan Left:   Left Arrow Key', False, (0, 0, 0))
                     controlsDone = False
                     while not controlsDone:
                         for event in pygame.event.get():
@@ -216,19 +220,13 @@ def main():
                         pygame.draw.rect(screen, GRAY, backButton)
                         screen.blit(back, (370,500))
                         
-                        screen.blit(player1, (200, 150))
-                        screen.blit(player2, (500, 150))
+                        screen.fill(CLEARGRAY, pygame.Rect(200, 200, 400, 50))
+                        screen.fill(CLEARGRAY, pygame.Rect(200, 300, 400, 50))
+                        screen.fill(CLEARGRAY, pygame.Rect(200, 400, 400, 50))
                         
-                        screen.fill(CLEARGRAY, pygame.Rect(200, 250, 400, 50), pygame.BLEND_MAX)
-                        screen.fill(CLEARGRAY, pygame.Rect(200, 350, 400, 50), pygame.BLEND_MAX)
-                        
-                        screen.blit(elevate, (350, 250))
-                        screen.blit(fire, (370, 350))
-                        
-                        screen.blit(wText, (230, 250))
-                        screen.blit(eText, (230, 350))
-                        screen.blit(iText, (550, 250))
-                        screen.blit(uText, (550, 350))
+                        screen.blit(fire, (225, 200))
+                        screen.blit(panRight, (205, 300))
+                        screen.blit(panLeft, (220, 400))
                         
                         # --- Update the screen with what we've drawn.
                         pygame.display.update()
@@ -240,6 +238,10 @@ def main():
                 if startButton.collidepoint(mouse_pos):
                     # Create initial objects to demonstrate
                     objects = []
+                    backgroundOffset = 0
+                    mouseDownPosition = Vec2d(-1, -1)
+                    score = 0
+                    scoreText = myfont.render("Score = "+str(score), False, (255, 255, 255))
                 
                     objects.append(Polygon(Vec2d(2,-1), Vec2d(0,0), 1, make_rectangle(2, 1), GRAY, 0, 0))
                     objects.append(Polygon(Vec2d(2, 1), Vec2d(0,0), 1, make_rectangle(0.1, 3), GRAY, 0, 0))
@@ -252,12 +254,13 @@ def main():
                     #objects.append(Polygon(Vec2d(-1,0), Vec2d(0,0), 1, make_polygon(1,3,0,0.5), GREEN, 0, 2))
                     
                     # Walls
-                    objects.append(Wall(Vec2d(-1,-1.5), Vec2d(0,1), BLACK))
+                    objects.append(Wall(Vec2d(0,-2.25), Vec2d(0,1), BLACK))
+                    objects.append(Wall(Vec2d(-4,0), Vec2d(1,0), BLACK))
+                    objects.append(Wall(Vec2d(12,0), Vec2d(-1,0), BLACK))
     
                     done = False
                     lineDrawn = False
                     count = 0
-                    paused = True
                     max_collisions = 1
                     result = []
                     while not done:
@@ -267,70 +270,88 @@ def main():
                                 objects = []
                                 exitGame = True
                                 done = True
-                                paused = True
-                            elif event.type == pygame.MOUSEBUTTONDOWN:
-                                paused = False
                             elif event.type == pygame.KEYDOWN: 
                                 if event.key == pygame.K_ESCAPE:
                                     objects = []
                                     done = True
-                                    paused = True 
-                                elif event.key == pygame.K_SPACE:
-                                    paused = not paused
-                                else:
-                                    paused = False
-                
-                        if not paused:
-                            for N in range(n_per_frame):
-                                # Physics
-                                # Calculate the force on each object
-                                for obj in objects:
-                                    obj.force.zero()
-                                    obj.force += Vec2d(0,-10) # gravity
-                           
-                                # Move each object according to physics
-                                for obj in objects:
-                                    obj.update(dt)
+                            elif event.type == pygame.MOUSEBUTTONDOWN:
+                                if pygame.mouse.get_pressed()[0] and mouseDownPosition.x == -1:
+                                    # Set mouseDownPosition to the currernt position
+                                    mouseDownPosition = Vec2d(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                                    lineDrawn = True
                                     
-                                for i in range(max_collisions):
-                                    collided = False
-                                    for i1 in range(len(objects)):
-                                        for i2 in range(i1):
-                                            if check_collision(objects[i1], objects[i2], result):
-                                                resolve_collision(result)
-                                                collided = True
-                                                #print("Collision")
-                                                #paused = True
-                                    if not collided: # if all collisions resolved, then we're done
-                                        break
-                                    
-                        if pygame.mouse.get_pressed()[0] and mouseDownPosition.x == -1 and paused != True:
-                            # Set mouseDownPosition to the currernt position
-                            mouseDownPosition = Vec2d(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                            lineDrawn = True
                         # When the user releases the mouse button
-                        elif pygame.mouse.get_pressed()[0] == False and mouseDownPosition.x != -1:
+                        if pygame.mouse.get_pressed()[0] == False and mouseDownPosition.x != -1:
                             # Calculate the velocity based on the distance between the two mouse positions
                             newVelocityX = (mouseDownPosition.x - pygame.mouse.get_pos()[0]) * 0.07
                             newVelocityY = (mouseDownPosition.y - pygame.mouse.get_pos()[1]) * -0.07
                             # Create the new ball
                             #cannon(Vec2d(-3, 0), Vec2d(newVelocityX,newVelocityY))
-                            objects.append(Polygon(Vec2d(-3, 0), Vec2d(newVelocityX,newVelocityY), 1, make_polygon(0.3,8,0,1), BLACK, 0, 0))
+                            objects.append(Polygon(Vec2d(-3, 0), Vec2d(newVelocityX,newVelocityY), 1, make_polygon(0.3,8,0,1), BLACK, 0, 0, False))
                             count += 1
                             print(count)
                             mouseDownPosition = Vec2d(-1, -1)
                             lineDrawn = False
+
+                        keys = pygame.key.get_pressed()
+                        if keys[pygame.K_RIGHT]:
+                            if(backgroundOffset > -800):
+                                coords.pan_in_coords(Vec2d(.1,0))
+                                backgroundOffset -= 10
+                        if keys[pygame.K_LEFT]:
+                            if(backgroundOffset < 0):
+                                coords.pan_in_coords(Vec2d(-.1,0))
+                                backgroundOffset += 10
+                        
+                        for N in range(n_per_frame):
+                            # Physics
+                            # Calculate the force on each object
+                            for obj in objects:
+                                obj.force.zero()
+                                obj.force += Vec2d(0,-10) # gravity
+                       
+                            # Move each object according to physics
+                            for obj in objects:
+                                obj.update(dt)
+                                
+                            for i in range(max_collisions):
+                                collided = False
+                                for i1 in range(len(objects)):
+                                    for i2 in range(i1):
+                                        if check_collision(objects[i1], objects[i2], result):
+                                            resolve_collision(result)
+                                            collided = True
+                                            #print("Collision")
+                                            #paused = True
+                                if not collided: # if all collisions resolved, then we're done
+                                    break
                  
+                        # Draw background
+                        screen.blit(background, (backgroundOffset,0))
+                        
                         # Drawing
-                        screen.fill(WHITE) # wipe the screen
                         for obj in objects:
                             obj.draw(screen, coords) # draw object to screen
                             
                         for obj in objects:
                             obj.update(dt)
+                            if obj.destroyed:
+                                #Update Score
+                                score += round(Decimal(obj.mass),2)
+                                scoreText = myfont.render("Score = "+str(score), False, (255, 255, 255))
+                                
+                                #Delete destroyed objects
+                                objects.remove(obj)
+                                del obj
+                                
                             if count > 3:
                                 #>add reset for balls
                                 count = 0
+                        
+                        screen.blit(background2, (backgroundOffset,0))
+                        
+                        # Draw score
+                        screen.blit(scoreText, (50,50))
                         
                         if lineDrawn:
                             pygame.draw.line(screen, BLACK, mouseDownPosition, pygame.mouse.get_pos(), 1)

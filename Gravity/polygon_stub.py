@@ -10,7 +10,7 @@ from vec2d import Vec2d
 import pygame
 
 class Polygon:
-    def __init__(self, pos, vel, density, points, color, angle=0, angvel=0):
+    def __init__(self, pos, vel, density, points, color, angle=0, angvel=0, breakable=True):
         self.pos = pos
         self.vel = vel
         self.color = color
@@ -21,6 +21,8 @@ class Polygon:
         self.force = Vec2d(0,0)
         self.torque = 0
         self.type = "polygon"
+        self.breakable = breakable
+        self.destroyed = False
 
         # Set origpoints
         self.origpoints = []
@@ -141,7 +143,7 @@ class Polygon:
         for p in self.points:
             points.append(coords.pos_to_screen(self.pos + p))
         pygame.draw.polygon(screen, self.color, points)
-        if True:
+        if False:
             for i in range(len(points)):
                 length = 50
                 n = coords.unitvec_to_other(self.normals[i])

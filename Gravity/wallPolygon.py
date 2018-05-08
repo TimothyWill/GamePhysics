@@ -21,6 +21,8 @@ class Wall:
         self.color = color
         self.force = Vec2d(0,0)
         self.type = "wall"
+        self.breakable = False
+        self.destroyed = False
     
     def update_mom(self, dt):
         self.mom += self.force*dt
@@ -68,7 +70,7 @@ class Wall:
             s.sort()
             start = pos + perp*s[1]
             end   = pos + perp*s[2]
-        pygame.draw.line(screen, self.color, start, end, 1)
+        #pygame.draw.line(screen, self.color, start, end, 1)
     
     def check_collision(self, other, result=[]):
         if other.type == "polygon":
