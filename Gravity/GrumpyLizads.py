@@ -75,7 +75,7 @@ def check_collision(a, b, result=[]):
 
 def resolve_collision(result):
     (a, b, d, n, pt) = result
-    e = 0.0
+    e = 0.5
     if a.type == "wall" or b.type == "wall":
         mu = 1.0
     else:

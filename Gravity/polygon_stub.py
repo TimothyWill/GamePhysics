@@ -213,4 +213,4 @@ class Polygon:
             # Extend the result to the result variable
             result.extend([self, other, overlap, normal, point])
             return True
-    
+        
