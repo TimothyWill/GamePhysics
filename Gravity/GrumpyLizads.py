@@ -72,7 +72,7 @@ def check_collision(a, b, result=[]):
             result.extend(result2)
         return True
     return False       
-
+            
 def resolve_collision(result):
     (a, b, d, n, pt) = result
     e = 0.5
@@ -136,6 +136,9 @@ def resolve_collision(result):
 def main():
     pygame.init()
     
+    # Variable where the position where the new ball will be placed is stored
+    mouseDownPosition = Vec2d(-1, -1);
+    
     #Import images
     background = pygame.image.load("background.jpg")
     background = pygame.transform.scale(background, (800, 600))
@@ -169,6 +172,9 @@ def main():
     n_per_frame = 10
     playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate/n_per_frame
+    
+    # Variable where the position where the new ball will be placed is stored
+    mouseDownPosition = Vec2d(-1, -1);
 
     # Main game loop
     exitGame = False
@@ -176,6 +182,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exitGame = True
+                
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = event.pos  # gets mouse position
 
@@ -228,12 +235,14 @@ def main():
                     
                         # This limits the loop to 60 frames per second
                         clock.tick(frame_rate)
+                
+                
                 if startButton.collidepoint(mouse_pos):
                     # Create initial objects to demonstrate
                     objects = []
                 
-                    objects.append(Polygon(Vec2d(0,-1), Vec2d(0,0), 1, make_rectangle(2, 1), GRAY, 0, 0))
-                    objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(0.1, 3), GRAY, 0, 0))
+                    objects.append(Polygon(Vec2d(2,-1), Vec2d(0,0), 1, make_rectangle(2, 1), GRAY, 0, 0))
+                    objects.append(Polygon(Vec2d(2, 1), Vec2d(0,0), 1, make_rectangle(0.1, 3), GRAY, 0, 0))
                     #objects.append(Polygon(Vec2d(-.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
                     #objects.append(Polygon(Vec2d(.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
                     #objects.append(Polygon(Vec2d(0, 1), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
@@ -246,6 +255,8 @@ def main():
                     objects.append(Wall(Vec2d(-1,-1.5), Vec2d(0,1), BLACK))
     
                     done = False
+                    lineDrawn = False
+                    count = 0
                     paused = True
                     max_collisions = 1
                     result = []
@@ -268,7 +279,7 @@ def main():
                                     paused = not paused
                                 else:
                                     paused = False
-                        
+                
                         if not paused:
                             for N in range(n_per_frame):
                                 # Physics
@@ -292,12 +303,37 @@ def main():
                                                 #paused = True
                                     if not collided: # if all collisions resolved, then we're done
                                         break
+                                    
+                        if pygame.mouse.get_pressed()[0] and mouseDownPosition.x == -1 and paused != True:
+                            # Set mouseDownPosition to the currernt position
+                            mouseDownPosition = Vec2d(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                            lineDrawn = True
+                        # When the user releases the mouse button
+                        elif pygame.mouse.get_pressed()[0] == False and mouseDownPosition.x != -1:
+                            # Calculate the velocity based on the distance between the two mouse positions
+                            newVelocityX = (mouseDownPosition.x - pygame.mouse.get_pos()[0]) * 0.07
+                            newVelocityY = (mouseDownPosition.y - pygame.mouse.get_pos()[1]) * -0.07
+                            # Create the new ball
+                            #cannon(Vec2d(-3, 0), Vec2d(newVelocityX,newVelocityY))
+                            objects.append(Polygon(Vec2d(-3, 0), Vec2d(newVelocityX,newVelocityY), 1, make_polygon(0.3,8,0,1), BLACK, 0, 0))
+                            count += 1
+                            print(count)
+                            mouseDownPosition = Vec2d(-1, -1)
+                            lineDrawn = False
                  
                         # Drawing
                         screen.fill(WHITE) # wipe the screen
                         for obj in objects:
                             obj.draw(screen, coords) # draw object to screen
                             
+                        for obj in objects:
+                            obj.update(dt)
+                            if count > 3:
+                                #>add reset for balls
+                                count = 0
+                        
+                        if lineDrawn:
+                            pygame.draw.line(screen, BLACK, mouseDownPosition, pygame.mouse.get_pos(), 1)
                         # --- Update the screen with what we've drawn.
                         pygame.display.update()
         
