@@ -131,15 +131,17 @@ def resolve_collision(result):
         Ja = Jn*nHat + Jt*tHat - Vec2d(0,PE)
         Jb = Jn*nHat + Jt*tHat + Vec2d(0,PE)
         
-        if a.type == "polygon" and b.type == "polygon":
+        if b.type == "polygon":
             if not a.breakable and b.breakable:
-                if Jb.x > 2 or Jb.x < -2 or Jb.y > 2 or Jb.y < -2:
+                threshold = 0.4
+                if Jb.x > threshold or Jb.x < -threshold or Jb.y > threshold or Jb.y < -threshold:
                     b.destroyed = True
         
         a.impulse(Ja,pt)
         b.impulse(-Jb,pt)
     
 def main():
+    breakables = 2
     pygame.init()
     
     # Variable where the position where the new ball will be placed is stored
@@ -152,7 +154,7 @@ def main():
     background2 = pygame.image.load("background2.png")
     background2 = pygame.transform.scale(background2, (1600, 600))
  
-    width = 800
+    width = 1600
     height = 600
     screen = pygame.display.set_mode([width,height])
     screen_center = Vec2d(width/2, height/2)
@@ -178,7 +180,7 @@ def main():
 
     # -------- Main Program Loop -----------\
     frame_rate = 60
-    n_per_frame = 10
+    n_per_frame = 5
     playback_speed = 1 # 1 is real time, 10 is 10x real speed, etc.
     dt = playback_speed/frame_rate/n_per_frame
     
@@ -243,8 +245,14 @@ def main():
                     score = 0
                     scoreText = myfont.render("Score = "+str(score), False, (255, 255, 255))
                 
-                    objects.append(Polygon(Vec2d(2,-1), Vec2d(0,0), 1, make_rectangle(2, 1), GRAY, 0, 0))
-                    objects.append(Polygon(Vec2d(2, 1), Vec2d(0,0), 1, make_rectangle(0.1, 3), GRAY, 0, 0))
+                    # Blocks
+                    objects.append(Polygon(Vec2d(2,-1.75), Vec2d(0,0), 1, make_rectangle(2, 1), GRAY, 0, 0, False))
+                    objects.append(Polygon(Vec2d(1.4, -.25), Vec2d(0,0), 1, make_rectangle(0.6, 1.7), GRAY, 0, 0, False))
+                    objects.append(Polygon(Vec2d(2.6, -.25), Vec2d(0,0), 1, make_rectangle(0.6, 1.7), GRAY, 0, 0, False))
+                    objects.append(Polygon(Vec2d(5, -.25), Vec2d(0,0), 1, make_rectangle(1, 4), GRAY, 0, 0, False))
+                    # PIGS
+                    objects.append(Polygon(Vec2d(2, -1), Vec2d(0,0), 1, make_rectangle(0.4, 0.4), GREEN, 0, 0, True))
+                    objects.append(Polygon(Vec2d(5, 2), Vec2d(0,0), 1, make_rectangle(0.4, 0.4), GREEN, 0, 0, True))
                     #objects.append(Polygon(Vec2d(-.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
                     #objects.append(Polygon(Vec2d(.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
                     #objects.append(Polygon(Vec2d(0, 1), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
@@ -255,8 +263,8 @@ def main():
                     
                     # Walls
                     objects.append(Wall(Vec2d(0,-2.25), Vec2d(0,1), BLACK))
-                    objects.append(Wall(Vec2d(-4,0), Vec2d(1,0), BLACK))
-                    objects.append(Wall(Vec2d(12,0), Vec2d(-1,0), BLACK))
+                    objects.append(Wall(Vec2d(-8,0), Vec2d(1,0), BLACK))
+                    objects.append(Wall(Vec2d(8,0), Vec2d(-1,0), BLACK))
     
                     done = False
                     lineDrawn = False
@@ -265,6 +273,10 @@ def main():
                     result = []
                     while not done:
                         # --- Main event loop
+
+                        if breakables == 0:
+                            breakables = 2
+                            break
                         for event in pygame.event.get(): 
                             if event.type == pygame.QUIT: # If user clicked close
                                 objects = []
@@ -287,7 +299,7 @@ def main():
                             newVelocityY = (mouseDownPosition.y - pygame.mouse.get_pos()[1]) * -0.07
                             # Create the new ball
                             #cannon(Vec2d(-3, 0), Vec2d(newVelocityX,newVelocityY))
-                            objects.append(Polygon(Vec2d(-3, 0), Vec2d(newVelocityX,newVelocityY), 1, make_polygon(0.3,8,0,1), BLACK, 0, 0, False))
+                            objects.append(Polygon(Vec2d(-7, 0), Vec2d(newVelocityX,newVelocityY), 1, make_polygon(0.3,8,0,1), BLACK, 0, 0, False))
                             count += 1
                             print(count)
                             mouseDownPosition = Vec2d(-1, -1)
@@ -325,7 +337,8 @@ def main():
                                             #paused = True
                                 if not collided: # if all collisions resolved, then we're done
                                     break
-                 
+                
+                    
                         # Draw background
                         screen.blit(background, (backgroundOffset,0))
                         
@@ -337,6 +350,7 @@ def main():
                             obj.update(dt)
                             if obj.destroyed:
                                 #Update Score
+                                breakables -= 1
                                 score += round(Decimal(obj.mass),2)
                                 scoreText = myfont.render("Score = "+str(score), False, (255, 255, 255))
                                 
