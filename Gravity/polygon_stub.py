@@ -10,7 +10,7 @@ from vec2d import Vec2d
 import pygame
 
 class Polygon:
-    def __init__(self, pos, vel, density, points, color, angle=0, angvel=0, breakable=True):
+    def __init__(self, pos, vel, density, points, color, angle=0, angvel=0, breakable=True, pig=False):
         self.pos = pos
         self.vel = vel
         self.color = color
@@ -23,6 +23,7 @@ class Polygon:
         self.type = "polygon"
         self.breakable = breakable
         self.destroyed = False
+        self.pig = pig
 
         # Set origpoints
         self.origpoints = []
@@ -143,12 +144,12 @@ class Polygon:
         for p in self.points:
             points.append(coords.pos_to_screen(self.pos + p))
         pygame.draw.polygon(screen, self.color, points)
-        if False:
+        """if False:
             for i in range(len(points)):
                 length = 50
                 n = coords.unitvec_to_other(self.normals[i])
                 p = (points[i] + points[i-1])/2
-                pygame.draw.line(screen, (0,0,0), p, p + length*n)
+                pygame.draw.line(screen, (0,0,0), p, p + length*n)"""
                 
     def check_collision(self, other, result=[]):
         result.clear() # See polygon_collision_test.py in check_collision()

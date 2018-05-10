@@ -10,7 +10,7 @@ from coords import Coords
 from polygon_stub import Polygon
 from wallPolygon import Wall
 from math import sqrt, acos, degrees, sin, cos
-from random import randint, random
+from random import uniform, randint, random
 from decimal import Decimal
 
 # Define some colors
@@ -133,15 +133,27 @@ def resolve_collision(result):
         
         if b.type == "polygon":
             if not a.breakable and b.breakable:
-                threshold = 0.4
+                if b.pig:
+                    threshold = 0.1
+                else:
+                    threshold = 0.6
                 if Jb.x > threshold or Jb.x < -threshold or Jb.y > threshold or Jb.y < -threshold:
                     b.destroyed = True
+            if a.breakable and b.breakable:
+                if b.pig:
+                    threshold = .1
+                    if Jb.x > threshold or Jb.x < -threshold or Jb.y > threshold or Jb.y < -threshold:
+                        b.destroyed = True
+        if b.type == "wall":
+            if a.pig:
+                threshold = 3
+                if Ja.x > threshold or Ja.x < -threshold or Ja.y > threshold or Ja.y < -threshold:
+                    a.destroyed = True
         
         a.impulse(Ja,pt)
         b.impulse(-Jb,pt)
     
 def main():
-    breakables = 2
     pygame.init()
     
     # Variable where the position where the new ball will be placed is stored
@@ -153,6 +165,12 @@ def main():
     
     background2 = pygame.image.load("background2.png")
     background2 = pygame.transform.scale(background2, (1600, 600))
+    
+    star = pygame.image.load("star-icon.png")
+    star = pygame.transform.scale(star, (100, 100))
+    
+    star2 = pygame.image.load("star-icon2.png")
+    star2 = pygame.transform.scale(star2, (100, 100))
  
     width = 1600
     height = 600
@@ -243,23 +261,20 @@ def main():
                     backgroundOffset = 0
                     mouseDownPosition = Vec2d(-1, -1)
                     score = 0
+                    breakables = 3
                     scoreText = myfont.render("Score = "+str(score), False, (255, 255, 255))
                 
                     # Blocks
-                    objects.append(Polygon(Vec2d(2,-1.75), Vec2d(0,0), 1, make_rectangle(2, 1), GRAY, 0, 0, False))
-                    objects.append(Polygon(Vec2d(1.4, -.25), Vec2d(0,0), 1, make_rectangle(0.6, 1.7), GRAY, 0, 0, False))
-                    objects.append(Polygon(Vec2d(2.6, -.25), Vec2d(0,0), 1, make_rectangle(0.6, 1.7), GRAY, 0, 0, False))
-                    objects.append(Polygon(Vec2d(5, -.25), Vec2d(0,0), 1, make_rectangle(1, 4), GRAY, 0, 0, False))
+                    
+                    objects.append(Polygon(Vec2d(2,-1.75), Vec2d(0,0), 1, make_rectangle(2, 1), GRAY, 0, 0))
+                    objects.append(Polygon(Vec2d(1.4, -.25), Vec2d(0,0), 1, make_rectangle(0.6, 1.7), GRAY, 0, 0))
+                    objects.append(Polygon(Vec2d(2.6, -.25), Vec2d(0,0), 1, make_rectangle(0.6, 1.7), GRAY, 0, 0))
+                    objects.append(Polygon(Vec2d(5, -.25), Vec2d(0,0), 1, make_rectangle(1, 4), GRAY, 0, 0))
+                    
                     # PIGS
-                    objects.append(Polygon(Vec2d(2, -1), Vec2d(0,0), 1, make_rectangle(0.4, 0.4), GREEN, 0, 0, True))
-                    objects.append(Polygon(Vec2d(5, 2), Vec2d(0,0), 1, make_rectangle(0.4, 0.4), GREEN, 0, 0, True))
-                    #objects.append(Polygon(Vec2d(-.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
-                    #objects.append(Polygon(Vec2d(.75, .6), Vec2d(0,0), 1, make_rectangle(0.25, 1.5), GRAY, 0, 0))
-                    #objects.append(Polygon(Vec2d(0, 1), Vec2d(0,0), 1, make_rectangle(0.5, 1.0), GRAY, 0, 0))
-                    #objects.append(Polygon(Vec2d(0, 2), Vec2d(0,0), 1, make_rectangle(2.0, 1.0), GRAY, 0, 0))
-                    #objects.append(Polygon(Vec2d(-0.5,1), Vec2d(0,0), 1, make_polygon(0.2,4,0,10), RED, 0, 1))
-                    #objects.append(Polygon(Vec2d(1,0), Vec2d(0,0), 1, make_polygon(0.3,7,0,3), BLUE, 0, -0.4))
-                    #objects.append(Polygon(Vec2d(-1,0), Vec2d(0,0), 1, make_polygon(1,3,0,0.5), GREEN, 0, 2))
+                    objects.append(Polygon(Vec2d(2, -1), Vec2d(0,0), 1, make_rectangle(0.4, 0.4), GREEN, 0, 0, True, True))
+                    objects.append(Polygon(Vec2d(5, 2), Vec2d(0,0), 1, make_rectangle(0.4, 0.4), GREEN, 0, 0, True, True))
+                    objects.append(Polygon(Vec2d(7, -2), Vec2d(0,0), 1, make_rectangle(0.4, 0.4), GREEN, 0, 0, True, True))
                     
                     # Walls
                     objects.append(Wall(Vec2d(0,-2.25), Vec2d(0,1), BLACK))
@@ -273,10 +288,6 @@ def main():
                     result = []
                     while not done:
                         # --- Main event loop
-
-                        if breakables == 0:
-                            breakables = 2
-                            break
                         for event in pygame.event.get(): 
                             if event.type == pygame.QUIT: # If user clicked close
                                 objects = []
@@ -299,12 +310,11 @@ def main():
                             newVelocityY = (mouseDownPosition.y - pygame.mouse.get_pos()[1]) * -0.07
                             # Create the new ball
                             #cannon(Vec2d(-3, 0), Vec2d(newVelocityX,newVelocityY))
-                            objects.append(Polygon(Vec2d(-7, 0), Vec2d(newVelocityX,newVelocityY), 1, make_polygon(0.3,8,0,1), BLACK, 0, 0, False))
+                            objects.append(Polygon(Vec2d(-6.8, -1.1), Vec2d(newVelocityX,newVelocityY), 1, make_polygon(0.3,8,0,1), BLACK, 0, 0, False))
                             count += 1
-                            print(count)
                             mouseDownPosition = Vec2d(-1, -1)
                             lineDrawn = False
-
+                        """
                         keys = pygame.key.get_pressed()
                         if keys[pygame.K_RIGHT]:
                             if(backgroundOffset > -800):
@@ -314,6 +324,93 @@ def main():
                             if(backgroundOffset < 0):
                                 coords.pan_in_coords(Vec2d(-.1,0))
                                 backgroundOffset += 10
+                        """
+                        if count == 3 or breakables == 0:
+                                score += 20 * (3 - count)
+                                scoringDone = False
+                                done = True
+                                while not scoringDone:
+                                    # --- Main event loop
+                                    for event in pygame.event.get(): 
+                                        if event.type == pygame.QUIT: # If user clicked close
+                                            objects = []
+                                            exitGame = True
+                                            scoringDone = True
+                                        elif event.type == pygame.KEYDOWN: 
+                                            if event.key == pygame.K_ESCAPE:
+                                                objects = []
+                                                scoringDone = True
+                                    
+                                    for N in range(n_per_frame):
+                                        # Physics
+                                        # Calculate the force on each object
+                                        for obj in objects:
+                                            obj.force.zero()
+                                            obj.force += Vec2d(0,-10) # gravity
+                                   
+                                        # Move each object according to physics
+                                        for obj in objects:
+                                            obj.update(dt)
+                                            
+                                        for i in range(max_collisions):
+                                            collided = False
+                                            for i1 in range(len(objects)):
+                                                for i2 in range(i1):
+                                                    if check_collision(objects[i1], objects[i2], result):
+                                                        resolve_collision(result)
+                                                        collided = True
+                                                        #print("Collision")
+                                                        #paused = True
+                                            if not collided: # if all collisions resolved, then we're done
+                                                break
+                                    
+                                    # Draw background
+                                    screen.blit(background, (backgroundOffset,0))
+                                    
+                                    # Drawing
+                                    for obj in objects:
+                                        obj.draw(screen, coords)
+                                        
+                                    for obj in objects:
+                                        if obj.destroyed:
+                                            #Update Score
+                                            if obj.pig:
+                                                breakables -= 1
+                                                score += 20
+                                            score += round(Decimal(obj.mass),2) * 2
+                                            scoreText = myfont.render("Score = "+str(score), False, (255, 255, 255))
+                                            
+                                            #Delete destroyed objects
+                                            objects.remove(obj)
+                                            del obj
+                                        
+                                    screen.blit(background2, (backgroundOffset,0))
+                        
+                                    # Draw score
+                                    screen.blit(scoreText, (700,250))
+                                    
+                                    if breakables == 3:
+                                        screen.blit(star2, (600,100))
+                                        screen.blit(star2, (740,100))
+                                        screen.blit(star2, (890,100))
+                                    if breakables == 2:
+                                        screen.blit(star, (600,100))
+                                        screen.blit(star2, (740,100))
+                                        screen.blit(star2, (890,100))
+                                    if breakables == 1:
+                                        screen.blit(star, (600,100))
+                                        screen.blit(star, (740,100))
+                                        screen.blit(star2, (890,100))
+                                    if breakables == 0:
+                                        screen.blit(star, (600,100))
+                                        screen.blit(star, (740,100))
+                                        screen.blit(star, (890,100))
+                                    
+                                    # --- Update the screen with what we've drawn.
+                                    pygame.display.update()
+                    
+                                    # This limits the loop to the specified frame rate
+                                    clock.tick(frame_rate)
                         
                         for N in range(n_per_frame):
                             # Physics
@@ -347,20 +444,17 @@ def main():
                             obj.draw(screen, coords) # draw object to screen
                             
                         for obj in objects:
-                            obj.update(dt)
                             if obj.destroyed:
                                 #Update Score
-                                breakables -= 1
-                                score += round(Decimal(obj.mass),2)
+                                if obj.pig:
+                                    breakables -= 1
+                                    score += 20
+                                score += round(Decimal(obj.mass),2) * 2
                                 scoreText = myfont.render("Score = "+str(score), False, (255, 255, 255))
                                 
                                 #Delete destroyed objects
                                 objects.remove(obj)
                                 del obj
-                                
-                            if count > 3:
-                                #>add reset for balls
-                                count = 0
                         
                         screen.blit(background2, (backgroundOffset,0))
                         
